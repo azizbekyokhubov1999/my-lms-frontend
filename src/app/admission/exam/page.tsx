@@ -607,7 +607,7 @@ export default function EntranceExamPage() {
             </h2>
             <p className="mt-3 text-center text-sm text-slate-600">
               Our AI and AQAD team will review your session. Results will be
-              available in your dashboard within 24 hours.
+              available in your student portal within 24 hours.
             </p>
             <div className="mt-6">
               <Link

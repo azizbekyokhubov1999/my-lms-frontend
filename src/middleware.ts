@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
 
   const blockedFromAqad = role === "student" || role === "applicant";
   if (pathname.startsWith("/aqad") && blockedFromAqad) {
-    return NextResponse.redirect(new URL(role === "applicant" ? "/admission/status" : "/dashboard", request.url));
+    return NextResponse.redirect(new URL(role === "applicant" ? "/admission/status" : "/student", request.url));
   }
 
   return NextResponse.next();

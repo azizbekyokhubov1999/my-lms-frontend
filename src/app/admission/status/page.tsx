@@ -370,7 +370,7 @@ export default function ApplicantStatusPage() {
                 }}
                 className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
               >
-                I&apos;ve uploaded вЂ” View dashboard
+                I&apos;ve uploaded вЂ” View student portal
               </button>
             </div>
           </Card>
@@ -872,7 +872,7 @@ export default function ApplicantStatusPage() {
                 </ol>
                 <div className="mt-6 border-t border-slate-100 pt-4">
                   <Link
-                    href="/dashboard"
+                    href="/student"
                     className="inline-flex h-10 items-center justify-center rounded-md bg-blue-900 px-4 text-sm font-medium text-white hover:bg-blue-800"
                   >
                     Go to student portal

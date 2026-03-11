@@ -320,13 +320,13 @@ export default function ExamByIdPage() {
           </div>
           <h2 className="text-xl font-semibold text-slate-900">Exam submitted</h2>
           <p className="mt-2 text-sm text-slate-600">
-            Your answers have been recorded. Results will be available on your dashboard within 24 hours.
+            Your answers have been recorded. Results will be available in your student portal within 24 hours.
           </p>
           <Link
-            href="/admission/status"
+            href="/student"
             className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-blue-900 px-4 py-3 text-sm font-medium text-white hover:bg-blue-800"
           >
-            Return to dashboard
+            Return to student portal
           </Link>
         </div>
       </div>

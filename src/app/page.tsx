@@ -46,7 +46,7 @@ const PATHS = [
   {
     key: "student",
     title: "Student",
-    description: "Already a student? Access your learning dashboard.",
+    description: "Already a student? Access your student portal.",
     href: "/auth/login?type=student",
   },
   {

@@ -88,7 +88,7 @@ function LoginForm() {
     type === "applicant"
       ? "Enter your phone and password to check your admission status."
       : type === "student"
-        ? "Use your institutional email to access your dashboard."
+        ? "Use your institutional email to access your student portal."
         : "Use your institutional email. MFA may be required.";
 
   return (

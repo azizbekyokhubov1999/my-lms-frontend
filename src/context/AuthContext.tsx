@@ -70,9 +70,9 @@ function getRedirectForRole(role: AuthRole): string {
     case "TEACHER":
       return "/teacher";
     case "STUDENT":
-      return "/dashboard";
+      return "/student";
     default:
-      return "/dashboard";
+      return "/student";
   }
 }
 
@@ -150,7 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
         setRoleCookie("STUDENT");
-        router.push("/dashboard");
+        router.push("/student");
         return { success: true };
       }
 
@@ -259,7 +259,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ? "/aqad"
             : role === "TEACHER"
               ? "/teacher"
-              : "/dashboard"
+              : "/student"
       );
     },
     [router]
