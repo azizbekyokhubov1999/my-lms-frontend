@@ -78,14 +78,15 @@ export default function TeacherCoursesPage() {
             Manage your courses. Create new ones or open existing to edit content and view students.
           </p>
         </div>
-        <Button
-          type="button"
-          variant="primary"
-          className="shrink-0 bg-teal-600 hover:bg-teal-700"
-          onClick={() => {}}
-        >
-          + Create New Course
-        </Button>
+        <Link href="/teacher/courses/builder/new">
+          <Button
+            type="button"
+            variant="primary"
+            className="shrink-0 bg-teal-600 hover:bg-teal-700"
+          >
+            + Create New Course
+          </Button>
+        </Link>
       </section>
 
       {/* Search & Filter */}
@@ -168,12 +169,16 @@ export default function TeacherCoursesPage() {
                       <span className="font-medium text-slate-900">{course.studentCount}</span>
                       {" "}students
                     </p>
-                    <Link
-                      href={`/teacher/courses/${course.id}`}
-                      className="mt-3 inline-block text-sm font-medium text-teal-600 hover:underline"
-                    >
-                      Open course →
-                    </Link>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Link href={`/teacher/courses/${course.id}`} className="text-sm font-medium text-teal-600 hover:underline">
+                        Open course →
+                      </Link>
+                      <Link href={`/teacher/courses/builder/${course.id}`}>
+                        <Button type="button" variant="outline" size="sm">
+                          Edit
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </Card>
               </li>

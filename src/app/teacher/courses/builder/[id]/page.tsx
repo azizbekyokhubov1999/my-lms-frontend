@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 
 import { Button } from "../../../../components/ui/Button";
@@ -48,6 +48,13 @@ interface MaterialResource {
 
 const CATEGORIES = ["Computer Science", "Engineering", "Research", "Business", "Mathematics", "Other"];
 
+const EMPTY_METADATA: CourseMetadata = {
+  title: "",
+  description: "",
+  category: "Computer Science",
+  credits: "",
+};
+
 const DEFAULT_MODULES: Module[] = [
   { id: "m1", title: "Introduction", order: 0, lectures: [{ id: "l1", title: "Welcome & Syllabus", durationMinutes: 15 }] },
   { id: "m2", title: "Core Concepts", order: 1, lectures: [{ id: "l2", title: "Lecture 1: Foundations", durationMinutes: 45 }, { id: "l3", title: "Lecture 2: Deep Dive", durationMinutes: 50 }] },
@@ -69,21 +76,31 @@ function computeCompleteness(meta: CourseMetadata, modules: Module[]): number {
 
 export default function CourseBuilderPage() {
   const params = useParams();
+  const router = useRouter();
   const id = (params?.id as string) ?? "";
+  const isNewCourse = id === "new";
 
-  const [metadata, setMetadata] = React.useState<CourseMetadata>({
-    title: "Machine Learning",
-    description: "Introduction to supervised and unsupervised learning, model evaluation, and practical applications.",
-    category: "Computer Science",
-    credits: "3",
-  });
-  const [modules, setModules] = React.useState<Module[]>(DEFAULT_MODULES);
-  const [expandedModuleId, setExpandedModuleId] = React.useState<string | null>("m1");
+  const [resolvedId, setResolvedId] = React.useState<string | null>(null);
+  const [metadata, setMetadata] = React.useState<CourseMetadata>(
+    isNewCourse ? EMPTY_METADATA : {
+      title: "Machine Learning",
+      description: "Introduction to supervised and unsupervised learning, model evaluation, and practical applications.",
+      category: "Computer Science",
+      credits: "3",
+    },
+  );
+  const [modules, setModules] = React.useState<Module[]>(isNewCourse ? [] : DEFAULT_MODULES);
+  const [expandedModuleId, setExpandedModuleId] = React.useState<string | null>(isNewCourse ? null : "m1");
   const [submitted, setSubmitted] = React.useState(false);
-  const [materials, setMaterials] = React.useState<MaterialResource[]>([
-    { id: "mat1", type: "video_link", title: "Intro video", description: "Week 1 overview recording.", url: "https://teams.microsoft.com/..." },
-    { id: "mat2", type: "pdf", title: "Syllabus", description: "Course syllabus and policies.", fileName: "syllabus.pdf", uploadProgress: 100 },
-  ]);
+  const [saveToast, setSaveToast] = React.useState<"saving" | "saved" | null>(null);
+  const [materials, setMaterials] = React.useState<MaterialResource[]>(
+    isNewCourse
+      ? []
+      : [
+          { id: "mat1", type: "video_link", title: "Intro video", description: "Week 1 overview recording.", url: "https://teams.microsoft.com/..." },
+          { id: "mat2", type: "pdf", title: "Syllabus", description: "Course syllabus and policies.", fileName: "syllabus.pdf", uploadProgress: 100 },
+        ],
+  );
   const [materialModalOpen, setMaterialModalOpen] = React.useState(false);
   const [newMaterialType, setNewMaterialType] = React.useState<MaterialType>("pdf");
   const [newMaterialTitle, setNewMaterialTitle] = React.useState("");
@@ -220,6 +237,21 @@ export default function CourseBuilderPage() {
     setSubmitted(true);
   };
 
+  const effectiveId = resolvedId ?? id;
+
+  const handleSaveDraft = () => {
+    setSaveToast("saving");
+    const newId = isNewCourse && !resolvedId ? "c" + Date.now() : effectiveId;
+    if (isNewCourse && !resolvedId) {
+      setResolvedId(newId);
+      router.replace(`/teacher/courses/builder/${newId}`);
+    }
+    setTimeout(() => {
+      setSaveToast("saved");
+      setTimeout(() => setSaveToast(null), 2500);
+    }, 1200);
+  };
+
   if (!id) {
     return (
       <div className="space-y-6">
@@ -240,19 +272,43 @@ export default function CourseBuilderPage() {
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-wrap items-center justify-between gap-4">
+      {/* Sticky header with Save Draft */}
+      <header className="sticky top-0 z-10 -mx-4 -mt-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mt-6 sm:px-6 lg:-mx-6 lg:-mt-6 lg:px-6">
         <div>
           <Link href="/teacher/courses" className="text-xs font-medium text-teal-600 hover:underline">
             ← Back to Courses
           </Link>
           <h1 className="mt-1 text-xl font-semibold text-slate-900 sm:text-2xl">
-            Course Builder
+            {isNewCourse ? "New Course" : "Course Builder"}
           </h1>
           <p className="mt-0.5 text-sm text-slate-600">
-            Edit metadata, modules, and lectures. Submit to AQAD when ready.
+            {isNewCourse ? "Create your course. Save draft to get a unique ID." : "Edit metadata, modules, and lectures. Submit to AQAD when ready."}
           </p>
         </div>
-      </section>
+        <div className="flex items-center gap-3">
+          {saveToast && (
+            <span
+              role="status"
+              className={cn(
+                "text-sm font-medium",
+                saveToast === "saving" && "text-amber-700",
+                saveToast === "saved" && "text-emerald-700",
+              )}
+            >
+              {saveToast === "saving" ? "Saving…" : "Draft saved."}
+            </span>
+          )}
+          <Button
+            type="button"
+            variant="primary"
+            className="bg-teal-600 hover:bg-teal-700"
+            onClick={handleSaveDraft}
+            disabled={saveToast === "saving"}
+          >
+            Save Draft
+          </Button>
+        </div>
+      </header>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
         {/* Main content */}
@@ -524,7 +580,7 @@ export default function CourseBuilderPage() {
               >
                 {submitted ? "Submitted to AQAD" : "Submit to AQAD"}
               </Button>
-              <Link href={`/student/courses/${id}`} target="_blank" rel="noopener noreferrer" className="block">
+              <Link href={`/teacher/courses/${effectiveId}/preview`} target="_blank" rel="noopener noreferrer" className="block">
                 <Button type="button" variant="outline" className="w-full">
                   Real-time Preview
                 </Button>

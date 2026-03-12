@@ -12,10 +12,11 @@ function cn(...classes: Array<string | false | null | undefined>) {
 
 // 1. Academic KPI Cards
 const KPI_CARDS = [
-  { label: "Active Courses", value: "6", subtext: "This semester" },
+  { label: "Active Courses", value: "6", subtext: "This semester", href: "/teacher/courses" },
   { label: "Total Students", value: "342", subtext: "Across all courses" },
   { label: "Average Attendance (%)", value: "87%", subtext: "Last 30 days" },
-  { label: "Pending Assignments to Grade", value: "23", subtext: "Require feedback" },
+  { label: "Pending Assignments to Grade", value: "5", subtext: "Require feedback", href: "/teacher/assignments" },
+  { label: "Exams to Grade", value: "4", subtext: "Proctoring verified", href: "/teacher/exams/5/grade" },
 ];
 
 // 2. Upcoming Lectures — today's live Teams lectures
@@ -61,20 +62,35 @@ export default function TeacherDashboardPage() {
       <section>
         <h2 className="sr-only">Academic KPIs</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {KPI_CARDS.map((card) => (
-            <Card
-              key={card.label}
-              className="rounded-lg border-slate-200 bg-white"
-            >
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                {card.label}
-              </p>
-              <p className="mt-1 text-2xl font-bold text-slate-900">
-                {card.value}
-              </p>
-              <p className="mt-0.5 text-xs text-slate-600">{card.subtext}</p>
-            </Card>
-          ))}
+          {KPI_CARDS.map((card) => {
+            const cardContent = (
+              <Card
+                key={card.label}
+                className={cn(
+                  "rounded-lg border-slate-200 bg-white",
+                  "href" in card && card.href && "cursor-pointer transition-shadow hover:shadow-md",
+                )}
+              >
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  {card.label}
+                </p>
+                <p className="mt-1 text-2xl font-bold text-slate-900">
+                  {card.value}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-600">{card.subtext}</p>
+                {"href" in card && card.href && (
+                  <p className="mt-2 text-xs font-medium text-teal-600">View →</p>
+                )}
+              </Card>
+            );
+            return "href" in card && card.href ? (
+              <Link key={card.label} href={card.href}>
+                {cardContent}
+              </Link>
+            ) : (
+              cardContent
+            );
+          })}
         </div>
       </section>
 
