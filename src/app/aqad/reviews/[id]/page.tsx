@@ -11,385 +11,244 @@ function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
-const QUALITY_AUDIT_CHECKLIST = [
-  { id: "1", label: "Learning outcomes defined" },
-  { id: "2", label: "Assessment matches outcomes" },
-  { id: "3", label: "Video quality standards" },
-  { id: "4", label: "Reading materials provided" },
-];
+// Mock audit data for the review
+const MOCK_AUDIT = {
+  courseName: "Advanced Algorithms",
+  courseCode: "CS 450",
+  instructor: "Prof. Sarah Chen",
+  reviewDate: "Mar 6, 2026",
+  checklistVersion: "v2.4",
+  academicStandards: [
+    { criterion: "Learning outcomes", status: "pass" as const, detail: "5 measurable outcomes; all aligned to Bloom's taxonomy." },
+    { criterion: "Syllabus alignment", status: "pass" as const, detail: "Weekly topics and assessments match syllabus 100%." },
+  ],
+  contentQuality: [
+    { criterion: "Video resolution", status: "pass" as const, detail: "1080p minimum; all lectures HD." },
+    { criterion: "Audio clarity", status: "pass" as const, detail: "No background noise; consistent levels." },
+    { criterion: "Subtitles", status: "flag" as const, detail: "Lecture 3 missing EN captions; requested." },
+  ],
+  assessmentIntegrity: [
+    { criterion: "Quiz difficulty", status: "pass" as const, detail: "Aligned with outcomes; no ceiling effects." },
+    { criterion: "Proctored exam settings", status: "pass" as const, detail: "Face + screen capture; rules documented." },
+  ],
+  reviewerComments: [
+    { content: "Week 1–2: Intro and complexity. Learning outcomes 1–2 covered.", note: "Clear structure. No issues." },
+    { content: "Week 3: Lecture 3 – Dynamic programming. Video 45 min.", note: "FLAG: Subtitles missing. Instructor notified." },
+    { content: "Midterm: 20 MC + 2 long-form. Proctoring enabled.", note: "Settings verified. No changes needed." },
+  ],
+  timeline: [
+    { step: "Submitted", date: "Feb 28, 2026", by: "Prof. Sarah Chen", status: "done" as const },
+    { step: "Flagged", date: "Mar 2, 2026", by: "Jane Smith (AQAD)", status: "done" as const },
+    { step: "Fixed", date: "Mar 5, 2026", by: "Prof. Sarah Chen", status: "done" as const },
+    { step: "Approved", date: "Mar 6, 2026", by: "Jane Smith (AQAD)", status: "current" as const },
+  ],
+};
 
-interface ConditionalApprovalModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: (changes: string) => void;
-}
-
-function ConditionalApprovalModal({
-  isOpen,
-  onClose,
-  onConfirm,
-}: ConditionalApprovalModalProps) {
-  const [changes, setChanges] = React.useState("");
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
-
-  React.useEffect(() => {
-    if (isOpen) {
-      setChanges("");
-      setTimeout(() => textareaRef.current?.focus(), 50);
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = changes.trim();
-    if (!trimmed) return;
-    onConfirm(trimmed);
-    onClose();
-    setChanges("");
+function StatusBadge({ status }: { status: "pass" | "flag" | "fail" }) {
+  const styles = {
+    pass: "bg-emerald-100 text-emerald-800",
+    flag: "bg-amber-100 text-amber-800",
+    fail: "bg-red-100 text-red-800",
   };
-
+  const labels = { pass: "Pass", flag: "Flag", fail: "Fail" };
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="conditional-approval-title"
-    >
-      <div
-        className="w-full max-w-md rounded-xl border border-slate-200 bg-white shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="border-b border-slate-200 px-4 py-3">
-          <h2 id="conditional-approval-title" className="text-base font-semibold text-slate-900">
-            Conditional approval
-          </h2>
-          <p className="mt-0.5 text-xs text-slate-600">
-            Approve only if the teacher makes these specific changes.
-          </p>
-        </div>
-        <form onSubmit={handleSubmit} className="px-4 py-4">
-          <label htmlFor="conditional-changes" className="block text-sm font-medium text-slate-800">
-            Required changes (required)
-          </label>
-          <textarea
-            ref={textareaRef}
-            id="conditional-changes"
-            rows={4}
-            required
-            value={changes}
-            onChange={(e) => setChanges(e.target.value)}
-            placeholder="e.g., Add measurable learning outcomes to slide 3. Replace video at 12:00 with HD version. Include chapter 2 reading in materials."
-            className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:border-indigo-600"
-          />
-          <div className="mt-4 flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" disabled={!changes.trim()} className="bg-amber-600 hover:bg-amber-700 focus-visible:ring-amber-600">
-              Approve conditionally
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <span className={cn("inline-flex rounded-full px-2 py-0.5 text-xs font-semibold", styles[status])}>
+      {labels[status]}
+    </span>
   );
 }
 
-interface RejectModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: (comments: string) => void;
-}
+export default function QualityAuditPage() {
+  const params = useParams();
+  const id = params?.id as string | undefined;
+  const [exporting, setExporting] = React.useState(false);
 
-function RejectModal({ isOpen, onClose, onConfirm }: RejectModalProps) {
-  const [comments, setComments] = React.useState("");
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
-
-  React.useEffect(() => {
-    if (isOpen) {
-      setComments("");
-      setTimeout(() => textareaRef.current?.focus(), 50);
+  const handleExportPdf = () => {
+    setExporting(true);
+    try {
+      window.print();
+    } finally {
+      setTimeout(() => setExporting(false), 500);
     }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = comments.trim();
-    if (!trimmed) return;
-    onConfirm(trimmed);
-    onClose();
-    setComments("");
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="reject-modal-title"
-    >
-      <div
-        className="w-full max-w-md rounded-xl border border-slate-200 bg-white shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="border-b border-slate-200 px-4 py-3">
-          <h2 id="reject-modal-title" className="text-base font-semibold text-slate-900">
-            Reject content — provide reasons
-          </h2>
-          <p className="mt-0.5 text-xs text-slate-600">
-            Your comments will be sent to the teacher for revision.
-          </p>
-        </div>
-        <form onSubmit={handleSubmit} className="px-4 py-4">
-          <label htmlFor="reject-comments" className="block text-sm font-medium text-slate-800">
-            Rejection reasons (required)
-          </label>
-          <textarea
-            ref={textareaRef}
-            id="reject-comments"
-            rows={4}
-            required
-            value={comments}
-            onChange={(e) => setComments(e.target.value)}
-            placeholder="e.g., Learning outcomes are vague. Please add measurable criteria. Video quality is below HD standard."
-            className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:border-indigo-600"
-          />
-          <div className="mt-4 flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={!comments.trim()}
-              className="bg-red-600 hover:bg-red-700 focus-visible:ring-red-600"
-            >
-              Confirm reject
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
+    <div className="space-y-6 print:space-y-4">
+      {/* Print: hide sidebar/header; use global .no-print in your CSS if needed */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `@media print { .no-print, header, aside, [aria-label="AQAD dashboard navigation"] { display: none !important; } main { padding: 0 !important; } }`,
+        }}
+      />
 
-export default function ContentReviewDetailPage() {
-  const params = useParams<{ id: string }>();
-  const reviewId = params?.id ?? "";
-
-  const [checklistState, setChecklistState] = React.useState<
-    Record<string, boolean>
-  >({});
-  const [status, setStatus] = React.useState<
-    "Draft" | "InReview" | "Approved" | "Rejected"
-  >("InReview");
-  const [rejectModalOpen, setRejectModalOpen] = React.useState(false);
-  const [conditionalModalOpen, setConditionalModalOpen] = React.useState(false);
-  const [rejectComments, setRejectComments] = React.useState<string | null>(null);
-  const [conditionalComments, setConditionalComments] = React.useState<string | null>(null);
-
-  const handleApprove = () => {
-    setStatus("Approved");
-  };
-
-  const handleConditionalApproval = (changes: string) => {
-    setStatus("Approved");
-    setConditionalComments(changes);
-  };
-
-  const handleReject = (comments: string) => {
-    setStatus("Rejected");
-    setRejectComments(comments);
-  };
-
-  const toggleCheck = (itemId: string) => {
-    setChecklistState((prev) => ({ ...prev, [itemId]: !prev[itemId] }));
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <Link
-            href="/aqad/reviews"
-            className="text-xs font-medium text-indigo-600 hover:underline"
-          >
-            ← Back to content review
-          </Link>
-          <h1 className="mt-1 text-xl font-semibold text-slate-900 sm:text-2xl">
-            Review #{reviewId}: Introduction to Machine Learning
-          </h1>
-          <p className="mt-0.5 text-sm text-slate-600">
-            CS 440 • Prof. Sarah Chen • Submitted Mar 6, 2026
-          </p>
-        </div>
-        <span
-          className={cn(
-            "inline-flex shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
-            status === "Approved" && "bg-emerald-50 text-emerald-800",
-            status === "Rejected" && "bg-red-50 text-red-700",
-            status === "InReview" && "bg-amber-50 text-amber-800",
-            status === "Draft" && "bg-slate-100 text-slate-700",
-          )}
-        >
-          {status}
-        </span>
+      <section className="no-print">
+        <Link href="/aqad/reviews" className="text-xs font-medium text-indigo-600 hover:underline">
+          ← Back to Course Reviews
+        </Link>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[280px,1fr]">
-        {/* Quality Audit Checklist Sidebar */}
-        <aside>
-          <Card className="rounded-lg border-slate-200">
-            <h2 className="text-sm font-semibold text-slate-900">
-              Quality audit checklist
-            </h2>
-            <p className="mt-0.5 text-xs text-slate-500">
-              All items must pass before full approval.
-            </p>
-            <ul className="mt-4 space-y-3">
-              {QUALITY_AUDIT_CHECKLIST.map((item) => (
-                <li key={item.id} className="flex items-start gap-2">
-                  <button
-                    type="button"
-                    onClick={() => toggleCheck(item.id)}
-                    className={cn(
-                      "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors",
-                      checklistState[item.id]
-                        ? "border-emerald-500 bg-emerald-500 text-white"
-                        : "border-slate-300 bg-white text-slate-400 hover:border-indigo-400",
-                    )}
-                    aria-label={`Mark "${item.label}" as checked`}
-                  >
-                    {checklistState[item.id] ? "✓" : ""}
-                  </button>
-                  <span className="text-xs font-medium text-slate-700">
-                    {item.label}
-                  </span>
+      {/* 1. Header */}
+      <header className="border-b border-slate-200 pb-4">
+        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl print:text-lg">
+          Quality Audit Checklist
+        </h1>
+        <p className="mt-1 text-sm text-slate-600 print:text-xs">
+          Review ID: {id ?? "—"}
+        </p>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 print:grid-cols-4 print:text-xs">
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Course</dt>
+            <dd className="mt-0.5 font-medium text-slate-900">
+              {MOCK_AUDIT.courseName} <span className="text-slate-500">({MOCK_AUDIT.courseCode})</span>
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Instructor</dt>
+            <dd className="mt-0.5 font-medium text-slate-900">{MOCK_AUDIT.instructor}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Review date</dt>
+            <dd className="mt-0.5 font-medium text-slate-900">{MOCK_AUDIT.reviewDate}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Checklist version</dt>
+            <dd className="mt-0.5 font-medium text-slate-900">{MOCK_AUDIT.checklistVersion}</dd>
+          </div>
+        </dl>
+      </header>
+
+      {/* 2. Audit Sections */}
+      <section>
+        <h2 className="text-sm font-semibold text-slate-900">Audit sections</h2>
+        <div className="mt-3 grid gap-4 lg:grid-cols-3">
+          <Card className="rounded-lg border-slate-200 p-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+              Academic Standards
+            </h3>
+            <ul className="mt-3 space-y-2">
+              {MOCK_AUDIT.academicStandards.map((item) => (
+                <li key={item.criterion} className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">{item.criterion}</p>
+                    <p className="text-xs text-slate-600">{item.detail}</p>
+                  </div>
+                  <StatusBadge status={item.status} />
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-[11px] text-slate-500">
-              {Object.values(checklistState).filter(Boolean).length} /{" "}
-              {QUALITY_AUDIT_CHECKLIST.length} criteria met
-            </p>
           </Card>
-        </aside>
+          <Card className="rounded-lg border-slate-200 p-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+              Content Quality
+            </h3>
+            <ul className="mt-3 space-y-2">
+              {MOCK_AUDIT.contentQuality.map((item) => (
+                <li key={item.criterion} className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">{item.criterion}</p>
+                    <p className="text-xs text-slate-600">{item.detail}</p>
+                  </div>
+                  <StatusBadge status={item.status} />
+                </li>
+              ))}
+            </ul>
+          </Card>
+          <Card className="rounded-lg border-slate-200 p-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+              Assessment Integrity
+            </h3>
+            <ul className="mt-3 space-y-2">
+              {MOCK_AUDIT.assessmentIntegrity.map((item) => (
+                <li key={item.criterion} className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-medium text-slate-900">{item.criterion}</p>
+                    <p className="text-xs text-slate-600">{item.detail}</p>
+                  </div>
+                  <StatusBadge status={item.status} />
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+      </section>
 
-        {/* Content Preview */}
-        <section className="min-w-0">
-          <Card className="rounded-lg border-slate-200">
-            <h2 className="text-sm font-semibold text-slate-900">
-              Content preview
-            </h2>
-            <p className="mt-0.5 text-xs text-slate-500">
-              As students would see this lecture and materials.
-            </p>
+      {/* 3. Reviewer Comments — side-by-side */}
+      <section>
+        <h2 className="text-sm font-semibold text-slate-900">Reviewer comments</h2>
+        <p className="mt-0.5 text-xs text-slate-500">
+          Content vs. auditor notes and flags
+        </p>
+        <Card className="mt-3 overflow-hidden rounded-lg border-slate-200 p-0">
+          <div className="grid border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 sm:grid-cols-2">
+            <div>Content / Section</div>
+            <div>Auditor notes &amp; flags</div>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {MOCK_AUDIT.reviewerComments.map((row, i) => (
+              <li key={i} className="grid gap-4 px-4 py-3 sm:grid-cols-2">
+                <div className="text-sm text-slate-700">{row.content}</div>
+                <div className="text-sm text-slate-800 font-medium">{row.note}</div>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      </section>
 
-            {/* Video placeholder */}
-            <div className="mt-4 overflow-hidden rounded-lg border border-slate-800 bg-slate-950">
-              <div className="flex h-48 items-center justify-center bg-slate-900 sm:h-64">
-                <div className="text-center text-sm text-slate-400">
-                  <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full border border-dashed border-slate-500" />
-                  <p>Lecture video placeholder (Teams / YouTube)</p>
+      {/* 4. Decision Timeline — vertical stepper */}
+      <section>
+        <h2 className="text-sm font-semibold text-slate-900">Decision timeline</h2>
+        <p className="mt-0.5 text-xs text-slate-500">
+          History of this review
+        </p>
+        <Card className="mt-3 rounded-lg border-slate-200 p-4">
+          <ul className="relative space-y-0">
+            {MOCK_AUDIT.timeline.map((item, i) => (
+              <li key={item.step} className="relative flex gap-4 pb-8 last:pb-0">
+                {i < MOCK_AUDIT.timeline.length - 1 && (
+                  <span
+                    className="absolute left-[11px] top-6 bottom-0 w-px bg-slate-200"
+                    aria-hidden
+                  />
+                )}
+                <span
+                  className={cn(
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+                    item.status === "current"
+                      ? "bg-indigo-600 text-white ring-4 ring-indigo-100"
+                      : "bg-slate-200 text-slate-700",
+                  )}
+                >
+                  {item.status === "current" ? "✓" : i + 1}
+                </span>
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <p className="font-medium text-slate-900">{item.step}</p>
+                  <p className="text-xs text-slate-500">
+                    {item.date} · {item.by}
+                  </p>
                 </div>
-              </div>
-            </div>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      </section>
 
-            {/* Materials placeholder */}
-            <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-              <h3 className="text-xs font-semibold text-slate-700">
-                Lecture materials
-              </h3>
-              <ul className="mt-2 space-y-2 text-xs text-slate-600">
-                <li className="flex items-center gap-2">
-                  <span className="text-slate-400">📄</span> slides-week-1.pdf
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-slate-400">📄</span> readings-chapter1.pdf
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-slate-400">📄</span> assignment-1.pdf
-                </li>
-              </ul>
-            </div>
-
-            {/* Rejection feedback (if rejected) */}
-            {status === "Rejected" && rejectComments && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                <h3 className="text-xs font-semibold text-red-800">
-                  Rejection feedback (sent to teacher)
-                </h3>
-                <p className="mt-1 text-sm text-red-700">{rejectComments}</p>
-              </div>
-            )}
-
-            {/* Conditional approval feedback */}
-            {status === "Approved" && conditionalComments && (
-              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-                <h3 className="text-xs font-semibold text-amber-800">
-                  Conditional approval — required changes (sent to teacher)
-                </h3>
-                <p className="mt-1 text-sm text-amber-900">{conditionalComments}</p>
-              </div>
-            )}
-
-            {/* Action Bar */}
-            {status !== "Approved" && status !== "Rejected" && (
-              <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-6">
-                <Button
-                  type="button"
-                  variant="primary"
-                  onClick={handleApprove}
-                  disabled={
-                    Object.values(checklistState).filter(Boolean).length <
-                    QUALITY_AUDIT_CHECKLIST.length
-                  }
-                  className="bg-emerald-600 hover:bg-emerald-700 focus-visible:ring-emerald-600"
-                >
-                  Approve
-                </Button>
-                <Button
-                  type="button"
-                  variant="primary"
-                  onClick={() => setConditionalModalOpen(true)}
-                  className="bg-amber-600 hover:bg-amber-700 focus-visible:ring-amber-600"
-                >
-                  Conditional approval
-                </Button>
-                <Button
-                  type="button"
-                  variant="primary"
-                  onClick={() => setRejectModalOpen(true)}
-                  className="bg-red-600 hover:bg-red-700 focus-visible:ring-red-600"
-                >
-                  Reject
-                </Button>
-                <Button type="button" variant="outline" className="border-indigo-600 text-indigo-700 hover:bg-indigo-50 focus-visible:ring-indigo-600">
-                  Request changes
-                </Button>
-              </div>
-            )}
-          </Card>
-        </section>
-      </div>
-
-      <RejectModal
-        isOpen={rejectModalOpen}
-        onClose={() => setRejectModalOpen(false)}
-        onConfirm={handleReject}
-      />
-      <ConditionalApprovalModal
-        isOpen={conditionalModalOpen}
-        onClose={() => setConditionalModalOpen(false)}
-        onConfirm={handleConditionalApproval}
-      />
+      {/* 5. Export PDF */}
+      <section className="no-print">
+        <Card className="rounded-lg border-slate-200 p-4">
+          <p className="text-sm text-slate-600">
+            Download this audit as a PDF using your browser&apos;s print dialog (Print → Save as PDF).
+          </p>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={handleExportPdf}
+            disabled={exporting}
+            className="mt-3 bg-indigo-600 hover:bg-indigo-700"
+          >
+            {exporting ? "Opening print…" : "Export / Print to PDF"}
+          </Button>
+        </Card>
+      </section>
     </div>
   );
 }

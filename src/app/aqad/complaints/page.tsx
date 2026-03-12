@@ -12,7 +12,12 @@ function cn(...classes: Array<string | false | null | undefined>) {
 
 type ComplaintType = "Technical" | "Academic" | "Financial";
 type Priority = "P1" | "P2" | "P3";
-type Status = "Open" | "Under Investigation" | "Resolved" | "Closed";
+/** Resolution workflow: Filed → Under Investigation → Evidence Gathered → Resolved */
+type Status =
+  | "Filed"
+  | "Under Investigation"
+  | "Evidence Gathered"
+  | "Resolved";
 
 interface Message {
   id: string;
@@ -26,7 +31,8 @@ interface Complaint {
   id: string;
   type: ComplaintType;
   priority: Priority;
-  slaCountdown: string;
+  /** Hours remaining to resolve (for SLA tracker) */
+  slaHoursRemaining: number;
   status: Status;
   title: string;
   studentName: string;
@@ -36,12 +42,27 @@ interface Complaint {
   messages: Message[];
 }
 
+const WORKFLOW_STEPS: Status[] = [
+  "Filed",
+  "Under Investigation",
+  "Evidence Gathered",
+  "Resolved",
+];
+
+function formatSlaRemaining(hours: number): string {
+  if (hours <= 0) return "Overdue";
+  const d = Math.floor(hours / 24);
+  const h = Math.round(hours % 24);
+  if (d > 0) return `${d}d ${h}h`;
+  return `${h}h`;
+}
+
 const COMPLAINTS: Complaint[] = [
   {
     id: "1",
     type: "Academic",
     priority: "P1",
-    slaCountdown: "2d 4h",
+    slaHoursRemaining: 52,
     status: "Under Investigation",
     title: "Grade dispute - Final exam",
     studentName: "John Smith",
@@ -76,8 +97,8 @@ const COMPLAINTS: Complaint[] = [
     id: "2",
     type: "Technical",
     priority: "P2",
-    slaCountdown: "4d 12h",
-    status: "Open",
+    slaHoursRemaining: 108,
+    status: "Filed",
     title: "Video not loading in lecture",
     studentName: "Emma Davis",
     teacherName: "Dr. James Wilson",
@@ -97,8 +118,8 @@ const COMPLAINTS: Complaint[] = [
     id: "3",
     type: "Financial",
     priority: "P1",
-    slaCountdown: "1d 8h",
-    status: "Open",
+    slaHoursRemaining: 32,
+    status: "Filed",
     title: "Duplicate payment charged",
     studentName: "Michael Brown",
     teacherName: "N/A",
@@ -114,17 +135,39 @@ const COMPLAINTS: Complaint[] = [
       },
     ],
   },
+  {
+    id: "4",
+    type: "Academic",
+    priority: "P3",
+    slaHoursRemaining: 0,
+    status: "Resolved",
+    title: "Assignment feedback delay",
+    studentName: "Lisa Park",
+    teacherName: "Dr. Emma Davis",
+    courseName: "RES 301 - Research Methods",
+    openedAt: "Mar 1, 2026",
+    messages: [],
+  },
 ];
 
-const STATUS_OPTIONS: { key: Status; label: string }[] = [
-  { key: "Open", label: "Open" },
+const TYPE_OPTIONS: { key: ComplaintType | "all"; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "Technical", label: "Technical" },
+  { key: "Academic", label: "Academic" },
+  { key: "Financial", label: "Financial" },
+];
+
+const STATUS_OPTIONS: { key: Status | "all"; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "Filed", label: "Filed" },
   { key: "Under Investigation", label: "Under Investigation" },
+  { key: "Evidence Gathered", label: "Evidence Gathered" },
   { key: "Resolved", label: "Resolved" },
-  { key: "Closed", label: "Closed" },
 ];
 
 export default function ComplaintsPage() {
   const [selectedId, setSelectedId] = React.useState<string | null>("1");
+  const [typeFilter, setTypeFilter] = React.useState<ComplaintType | "all">("all");
   const [statusFilter, setStatusFilter] = React.useState<Status | "all">("all");
   const [correctiveAction, setCorrectiveAction] = React.useState("");
   const [correctiveDeadline, setCorrectiveDeadline] = React.useState("");
@@ -133,10 +176,11 @@ export default function ComplaintsPage() {
     ? COMPLAINTS.find((c) => c.id === selectedId)
     : null;
 
-  const filteredComplaints =
-    statusFilter === "all"
-      ? COMPLAINTS
-      : COMPLAINTS.filter((c) => c.status === statusFilter);
+  const filteredComplaints = COMPLAINTS.filter((c) => {
+    if (typeFilter !== "all" && c.type !== typeFilter) return false;
+    if (statusFilter !== "all" && c.status !== statusFilter) return false;
+    return true;
+  });
 
   const getTypeStyles = (type: ComplaintType) => {
     switch (type) {
@@ -166,18 +210,20 @@ export default function ComplaintsPage() {
 
   const getStatusStyles = (status: Status) => {
     switch (status) {
-      case "Open":
-        return "bg-amber-50 text-amber-800 border-amber-200";
+      case "Filed":
+        return "bg-slate-100 text-slate-800 border-slate-200";
       case "Under Investigation":
+        return "bg-amber-50 text-amber-800 border-amber-200";
+      case "Evidence Gathered":
         return "bg-indigo-50 text-indigo-800 border-indigo-200";
       case "Resolved":
         return "bg-emerald-50 text-emerald-800 border-emerald-200";
-      case "Closed":
-        return "bg-slate-100 text-slate-700 border-slate-200";
       default:
         return "bg-slate-100 text-slate-600";
     }
   };
+
+  const workflowStepIndex = (s: Status) => WORKFLOW_STEPS.indexOf(s);
 
   const handleAssignCorrective = (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,18 +247,37 @@ export default function ComplaintsPage() {
       </section>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Triage table */}
+        {/* Triage: sort by Technical / Academic / Financial */}
         <section className="lg:col-span-1">
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-slate-900">Triage</h2>
+          <h2 className="text-sm font-semibold text-slate-900">Triage</h2>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Filter by type and status. SLA = time remaining to resolve.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className="sr-only">Filter by type</span>
+            {TYPE_OPTIONS.map((opt) => (
+              <button
+                key={opt.key}
+                type="button"
+                onClick={() => setTypeFilter(opt.key as ComplaintType | "all")}
+                className={cn(
+                  "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                  typeFilter === opt.key
+                    ? "bg-indigo-600 text-white"
+                    : "border border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:text-indigo-700",
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
             <select
               value={statusFilter}
               onChange={(e) =>
                 setStatusFilter(e.target.value as Status | "all")
               }
-              className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-700"
+              className="rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700"
+              aria-label="Filter by status"
             >
-              <option value="all">All</option>
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt.key} value={opt.key}>
                   {opt.label}
@@ -220,8 +285,8 @@ export default function ComplaintsPage() {
               ))}
             </select>
           </div>
-          <Card className="overflow-hidden rounded-lg border-slate-200 p-0">
-            <div className="max-h-[420px] overflow-y-auto">
+          <Card className="mt-3 overflow-hidden rounded-lg border-slate-200 p-0">
+            <div className="max-h-[400px] overflow-y-auto">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-slate-50">
                   <tr className="border-b border-slate-200">
@@ -229,7 +294,7 @@ export default function ComplaintsPage() {
                       Type / Priority
                     </th>
                     <th className="px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-slate-600">
-                      SLA
+                      SLA remaining
                     </th>
                   </tr>
                 </thead>
@@ -267,13 +332,13 @@ export default function ComplaintsPage() {
                       <td className="px-3 py-2">
                         <span
                           className={cn(
-                            "font-mono text-[11px]",
-                            c.priority === "P1"
-                              ? "font-bold text-red-700"
-                              : "text-slate-600",
+                            "font-mono text-[11px] font-semibold",
+                            c.slaHoursRemaining <= 0 && "text-slate-500",
+                            c.slaHoursRemaining > 0 && c.slaHoursRemaining < 24 && "text-red-700",
+                            c.slaHoursRemaining >= 24 && "text-slate-600",
                           )}
                         >
-                          {c.slaCountdown}
+                          {formatSlaRemaining(c.slaHoursRemaining)}
                         </span>
                       </td>
                     </tr>
@@ -288,34 +353,76 @@ export default function ComplaintsPage() {
         <section className="lg:col-span-2 space-y-4">
           {selected ? (
             <>
-              {/* Status tracker */}
+              {/* SLA Tracker: time remaining to resolve */}
               <Card className="rounded-lg border-slate-200">
                 <h3 className="text-xs font-semibold text-slate-700">
-                  Status tracker
+                  SLA tracker
                 </h3>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {STATUS_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => {}}
-                      className={cn(
-                        "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                        selected.status === opt.key
-                          ? getStatusStyles(opt.key)
-                          : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50",
-                      )}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                <p className="mt-0.5 text-[11px] text-slate-500">
+                  Time remaining to resolve this complaint per policy
+                </p>
+                <div
+                  className={cn(
+                    "mt-3 rounded-lg border px-4 py-3",
+                    selected.slaHoursRemaining <= 0 && "border-slate-200 bg-slate-50",
+                    selected.slaHoursRemaining > 0 && selected.slaHoursRemaining < 24 && "border-amber-300 bg-amber-50",
+                    selected.slaHoursRemaining >= 24 && "border-emerald-200 bg-emerald-50/50",
+                  )}
+                >
+                  <p
+                    className={cn(
+                      "font-mono text-lg font-bold",
+                      selected.slaHoursRemaining <= 0 && "text-slate-600",
+                      selected.slaHoursRemaining > 0 && selected.slaHoursRemaining < 24 && "text-amber-800",
+                      selected.slaHoursRemaining >= 24 && "text-emerald-800",
+                    )}
+                  >
+                    {formatSlaRemaining(selected.slaHoursRemaining)}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-slate-600">
+                    {selected.slaHoursRemaining <= 0
+                      ? "Resolution deadline passed"
+                      : selected.slaHoursRemaining < 24
+                        ? "Less than 24 hours remaining"
+                        : "Within SLA"}
+                  </p>
                 </div>
-                <p className="mt-2 text-xs text-slate-500">
-                  Current:{" "}
-                  <span className="font-semibold text-slate-700">
-                    {selected.status}
-                  </span>
-                  {" • "}
+              </Card>
+
+              {/* Resolution workflow: Filed → Under Investigation → Evidence Gathered → Resolved */}
+              <Card className="rounded-lg border-slate-200">
+                <h3 className="text-xs font-semibold text-slate-700">
+                  Resolution workflow
+                </h3>
+                <p className="mt-0.5 text-[11px] text-slate-500">
+                  Investigation steps — current stage highlighted
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-1">
+                  {WORKFLOW_STEPS.map((step, i) => {
+                    const isActive = selected.status === step;
+                    const isPast = workflowStepIndex(selected.status) > i;
+                    return (
+                      <React.Fragment key={step}>
+                        <span
+                          className={cn(
+                            "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                            isActive && getStatusStyles(step),
+                            isPast && "border-emerald-200 bg-emerald-50 text-emerald-800",
+                            !isActive && !isPast && "border-slate-200 bg-white text-slate-500",
+                          )}
+                        >
+                          {step}
+                        </span>
+                        {i < WORKFLOW_STEPS.length - 1 && (
+                          <span className="hidden text-slate-300 sm:inline" aria-hidden>
+                            →
+                          </span>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+                <p className="mt-3 text-xs text-slate-500">
                   Opened {selected.openedAt} • {selected.studentName} vs{" "}
                   {selected.teacherName}
                 </p>

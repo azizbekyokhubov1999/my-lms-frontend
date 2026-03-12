@@ -20,6 +20,8 @@ interface AuditLog {
   courseName: string;
   examDate: string;
   riskScore: number;
+  /** AI-detected issue types for the flagged exams list */
+  flagTypes: string[];
   alerts: { timestamp: string; message: string }[];
   forensicTimeline: ForensicMarker[];
   slaHoursRemaining: number;
@@ -32,6 +34,7 @@ const AUDIT_LOGS: AuditLog[] = [
     courseName: "CS 440 - Machine Learning",
     examDate: "Mar 5, 2026 14:30",
     riskScore: 82,
+    flagTypes: ["Face mismatch", "Second screen", "Multiple faces"],
     alerts: [
       { timestamp: "14:35:12", message: "Face not detected for 8 seconds" },
       { timestamp: "14:42:08", message: "Secondary screen detected" },
@@ -51,6 +54,7 @@ const AUDIT_LOGS: AuditLog[] = [
     courseName: "RES 301 - Research Methods",
     examDate: "Mar 4, 2026 10:00",
     riskScore: 45,
+    flagTypes: ["Glance away"],
     alerts: [
       { timestamp: "10:12:05", message: "Brief glance away from screen" },
     ],
@@ -65,6 +69,7 @@ const AUDIT_LOGS: AuditLog[] = [
     courseName: "CS 350 - Database Systems",
     examDate: "Mar 3, 2026 15:45",
     riskScore: 91,
+    flagTypes: ["Face mismatch", "Second screen", "Suspicious head movement", "Multiple faces"],
     alerts: [
       { timestamp: "15:48:22", message: "Face not detected for 12 seconds" },
       { timestamp: "15:52:40", message: "Secondary screen detected" },
@@ -85,6 +90,7 @@ const AUDIT_LOGS: AuditLog[] = [
     courseName: "CS 210 - Data Structures",
     examDate: "Mar 2, 2026 09:00",
     riskScore: 12,
+    flagTypes: [],
     alerts: [],
     forensicTimeline: [],
     slaHoursRemaining: 72,
@@ -114,23 +120,22 @@ export default function ExamAuditPage() {
           Exam audit
         </h1>
         <p className="mt-1 text-sm text-slate-600">
-          Review proctoring logs and forensic reports. Take action on
-          high-risk exams.
+          Proctoring analysis: review flagged exams, forensic recordings, and take action.
         </p>
       </section>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Audit Logs List */}
+        {/* Flagged Exams List — AI-detected suspicious behavior */}
         <section className="lg:col-span-2">
           <h2 className="text-sm font-semibold text-slate-900">
-            Audit logs
+            Flagged exams
           </h2>
           <p className="mt-0.5 text-xs text-slate-500">
-            Completed exams with proctoring risk score (0–100%)
+            Exams where AI detected suspicious behavior (face mismatch, second screen, etc.)
           </p>
           <Card className="mt-3 overflow-hidden rounded-lg border-slate-200 p-0">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[520px] text-sm">
+              <table className="w-full min-w-[560px] text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-600">
@@ -141,6 +146,9 @@ export default function ExamAuditPage() {
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-600">
                       Risk score
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-600">
+                      AI flags
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-600">
                       Action
@@ -185,6 +193,22 @@ export default function ExamAuditPage() {
                           </span>
                         )}
                       </td>
+                      <td className="px-4 py-3">
+                        {log.flagTypes.length === 0 ? (
+                          <span className="text-xs text-slate-400">—</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1">
+                            {log.flagTypes.map((flag) => (
+                              <span
+                                key={flag}
+                                className="inline-flex rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold text-red-800"
+                              >
+                                {flag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-right">
                         <button
                           type="button"
@@ -201,13 +225,13 @@ export default function ExamAuditPage() {
           </Card>
         </section>
 
-        {/* Forensic Report (when selected) */}
+        {/* Forensic Report — side-by-side screen + camera during incident */}
         <section>
           <h2 className="text-sm font-semibold text-slate-900">
             Forensic report
           </h2>
           <p className="mt-0.5 text-xs text-slate-500">
-            Timestamped alerts and recording
+            Side-by-side view: screen recording and camera feed during incident
           </p>
 
           {selected ? (
@@ -229,6 +253,40 @@ export default function ExamAuditPage() {
                   >
                     Risk: {selected.riskScore}%
                   </span>
+                </div>
+
+                {/* Side-by-side: Screen recording + Camera feed during incident */}
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-700">
+                    Recording at time of incident
+                  </h3>
+                  <p className="mt-0.5 text-[10px] text-slate-500">
+                    Screen and camera feed synced to first flagged moment
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-3">
+                    <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-900">
+                      <div className="border-b border-slate-700 px-2 py-1 text-[10px] font-semibold text-slate-300">
+                        Screen recording
+                      </div>
+                      <div className="flex aspect-video items-center justify-center bg-slate-950">
+                        <div className="text-center text-[10px] text-slate-500">
+                          <div className="mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded border border-dashed border-slate-600" />
+                          <p>Screen capture</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-900">
+                      <div className="border-b border-slate-700 px-2 py-1 text-[10px] font-semibold text-slate-300">
+                        Camera feed
+                      </div>
+                      <div className="flex aspect-video items-center justify-center bg-slate-950">
+                        <div className="text-center text-[10px] text-slate-500">
+                          <div className="mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full border border-dashed border-slate-600" />
+                          <p>Webcam</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Timestamped alerts */}
@@ -257,27 +315,13 @@ export default function ExamAuditPage() {
                   )}
                 </div>
 
-                {/* Video placeholder */}
-                <div>
-                  <h3 className="text-xs font-semibold text-slate-700">
-                    Recorded video
-                  </h3>
-                  <div className="mt-2 flex h-32 items-center justify-center rounded-lg border border-slate-800 bg-slate-900">
-                    <div className="text-center text-xs text-slate-400">
-                      <div className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-slate-500" />
-                      <p>Video placeholder</p>
-                      <p className="text-[10px]">Exam recording</p>
-                    </div>
-                  </div>
-                </div>
-
                 {/* AI Forensic Timeline */}
                 <div>
                   <h3 className="text-xs font-semibold text-slate-700">
                     AI forensic timeline
                   </h3>
                   <p className="mt-0.5 text-[10px] text-slate-500">
-                    Timestamped markers where AI detected potential issues (exam time)
+                    Exam time (MM:SS) — AI-detected potential issues
                   </p>
                   {selected.forensicTimeline.length === 0 ? (
                     <p className="mt-2 text-xs text-slate-500">
@@ -313,35 +357,35 @@ export default function ExamAuditPage() {
                   </p>
                 </div>
 
-                {/* Decision actions */}
+                {/* Action: Void Exam, Issue Warning, Clear Flag */}
                 <div className="space-y-2 border-t border-slate-200 pt-4">
                   <h3 className="text-xs font-semibold text-slate-700">
-                    Decision actions
+                    Action
                   </h3>
                   <div className="flex flex-col gap-2">
                     <Button
                       type="button"
                       variant="primary"
                       size="sm"
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 focus-visible:ring-emerald-600"
+                      className="w-full bg-red-600 hover:bg-red-700 focus-visible:ring-red-600"
                     >
-                      Validate result
+                      Void exam
                     </Button>
                     <Button
                       type="button"
                       variant="primary"
                       size="sm"
-                      className="w-full bg-red-600 hover:bg-red-700 focus-visible:ring-red-600"
+                      className="w-full bg-amber-600 hover:bg-amber-700 focus-visible:ring-amber-600"
                     >
-                      Invalidate result (cheating)
+                      Issue warning
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="w-full border-amber-500 text-amber-700 hover:bg-amber-50 focus-visible:ring-amber-500"
+                      className="w-full border-slate-300 text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-500"
                     >
-                      Escalate to director
+                      Clear flag
                     </Button>
                   </div>
                 </div>
@@ -350,7 +394,7 @@ export default function ExamAuditPage() {
           ) : (
             <Card className="mt-3 flex h-64 items-center justify-center rounded-lg border border-dashed border-slate-200">
               <p className="text-sm text-slate-500">
-                Select an exam to view the forensic report
+                Select a flagged exam to view the forensic report
               </p>
             </Card>
           )}
