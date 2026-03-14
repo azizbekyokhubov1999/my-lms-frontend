@@ -24,7 +24,7 @@ const NAV_ITEMS: Array<{ href: string; label: string; tooltip: string; icon: Rea
 function DashboardIcon() {
   return (
     <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
     </svg>
   );
 }
@@ -52,14 +52,14 @@ function ReconciliationIcon() {
 function DebtsIcon() {
   return (
     <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
     </svg>
   );
 }
 function BlockingIcon() {
   return (
     <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
     </svg>
   );
 }
@@ -73,7 +73,7 @@ function ReportsIcon() {
 function AuditIcon() {
   return (
     <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
     </svg>
   );
 }
@@ -99,21 +99,68 @@ function MenuIcon() {
   );
 }
 
+const STORAGE_KEY = "finance-sidebar-collapsed";
+const MOCK_STUDENT_IDS = ["STU-10001", "STU-10002", "STU-10003", "STU-10004", "STU-10005", "STU-10042", "STU-10088", "STU-10105"];
+
+function readCollapsed(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return localStorage.getItem(STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
 export default function FinanceLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [studentSearch, setStudentSearch] = React.useState("");
+  const [searchOpen, setSearchOpen] = React.useState(false);
+  const searchRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    setCollapsed(readCollapsed());
+  }, []);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, String(collapsed));
+    } catch {
+      /* ignore */
+    }
+  }, [collapsed]);
 
   React.useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
+  React.useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
   const showCollapsed = collapsed && !mobileOpen;
 
+  const searchResults = React.useMemo(() => {
+    if (!studentSearch.trim()) return [];
+    const q = studentSearch.trim().toLowerCase();
+    return MOCK_STUDENT_IDS.filter((id) => id.toLowerCase().includes(q)).slice(0, 6);
+  }, [studentSearch]);
+
+  const handleSearchSelect = (id: string) => {
+    setStudentSearch(id);
+    setSearchOpen(false);
+  };
+
   const sidebarContent = (
-    <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-4" aria-label="Finance navigation">
+    <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3 sm:p-4 overscroll-contain touch-pan-y" aria-label="Finance navigation">
       {NAV_ITEMS.map((item) => (
         <Link
           key={item.href}
@@ -121,7 +168,7 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
           title={showCollapsed ? item.tooltip : undefined}
           aria-current={isActive(item.href) ? "page" : undefined}
           className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            "flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors touch-manipulation",
             isActive(item.href)
               ? "bg-emerald-50 text-emerald-700"
               : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
@@ -137,7 +184,7 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
-      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b border-slate-200 bg-white px-4 shadow-sm print:hidden">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 shadow-sm print:hidden sm:gap-4 sm:px-4">
         <Button
           type="button"
           variant="secondary"
@@ -159,7 +206,7 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
           <ChevronIcon left={!collapsed} />
         </Button>
 
-        <div className="relative flex-1 max-w-sm min-w-0">
+        <div ref={searchRef} className="relative flex-1 max-w-sm min-w-0">
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
             <SearchIcon />
           </span>
@@ -167,13 +214,43 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
             type="search"
             placeholder="Quick Search: Student ID..."
             value={studentSearch}
-            onChange={(e) => setStudentSearch(e.target.value)}
+            onChange={(e) => {
+              setStudentSearch(e.target.value);
+              setSearchOpen(true);
+            }}
+            onFocus={() => setSearchOpen(true)}
             className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-emerald-300 focus:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-100"
             aria-label="Quick search by student ID"
+            aria-expanded={searchOpen && searchResults.length > 0}
+            aria-haspopup="listbox"
           />
+          {searchOpen && searchResults.length > 0 && (
+            <ul
+              role="listbox"
+              className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
+            >
+              {searchResults.map((id) => (
+                <li key={id} role="option">
+                  <button
+                    type="button"
+                    onClick={() => handleSearchSelect(id)}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-800"
+                  >
+                    <span className="font-mono">{id}</span>
+                    <span className="text-xs text-slate-500">Student</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {searchOpen && studentSearch.trim() && searchResults.length === 0 && (
+            <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-lg">
+              No students found for &quot;{studentSearch}&quot;
+            </div>
+          )}
         </div>
 
-        <span className="shrink-0 text-sm font-medium text-slate-600">Finance</span>
+        <span className="hidden shrink-0 text-sm font-medium text-slate-600 sm:inline">Finance</span>
       </header>
 
       <div className="relative flex flex-1 overflow-hidden">
@@ -186,16 +263,16 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
         )}
         <aside
           className={cn(
-            "flex shrink-0 flex-col border-r border-slate-200 bg-white transition-[width] duration-200 print:hidden",
-            "fixed left-0 top-14 z-40 h-[calc(100vh-3.5rem)] lg:relative lg:top-0 lg:h-full",
+            "flex shrink-0 flex-col border-r border-slate-200 bg-white transition-[width] duration-200 ease-out print:hidden",
+            "fixed left-0 top-14 z-40 h-[calc(100vh-3.5rem)] w-64 md:w-72 lg:relative lg:top-0 lg:h-full",
             collapsed ? "lg:w-16" : "lg:w-56",
-            mobileOpen ? "flex w-56" : "hidden lg:flex",
+            mobileOpen ? "flex" : "hidden lg:flex",
           )}
         >
           {sidebarContent}
         </aside>
 
-        <main className="min-w-0 flex-1 overflow-y-auto p-6">
+        <main className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
           {children}
         </main>
       </div>

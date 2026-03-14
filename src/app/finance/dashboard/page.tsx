@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 
-import { Card } from "../../../components/ui/Card";
+import { Card } from "../../components/ui/Card";
 
 function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
@@ -88,13 +88,14 @@ function BarChart({ data }: { data: typeof REVENUE_VS_TARGETS }) {
 
 function PieChart({ data }: { data: typeof PAYMENT_METHODS }) {
   const total = data.reduce((s, d) => s + d.value, 0);
-  let accDeg = 0;
-  const segments = data.map((d) => {
-    const startDeg = accDeg;
-    const sweepDeg = (d.value / total) * 360;
-    accDeg += sweepDeg;
-    return { ...d, startDeg, sweepDeg };
-  });
+  const segments = data.reduce<Array<{ label: string; value: number; color: string; startDeg: number; sweepDeg: number }>>(
+    (acc, d) => {
+      const startDeg = acc.length === 0 ? 0 : acc[acc.length - 1]!.startDeg + acc[acc.length - 1]!.sweepDeg;
+      const sweepDeg = (d.value / total) * 360;
+      return [...acc, { ...d, startDeg, sweepDeg }];
+    },
+    []
+  );
   const r = 40;
   const cx = 50;
   const cy = 50;

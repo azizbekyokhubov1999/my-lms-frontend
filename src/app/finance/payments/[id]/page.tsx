@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import * as React from "react";
 
-import { Button } from "../../../../components/ui/Button";
+import { Button } from "../../../components/ui/Button";
 
 // Mock payment data by ID
 const MOCK_PAYMENT_BY_ID: Record<string, { transactionId: string; studentName: string; studentId: string; amount: number; method: string; date: string; status: string }> = {
