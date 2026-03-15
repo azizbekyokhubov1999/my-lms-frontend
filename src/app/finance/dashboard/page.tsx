@@ -57,7 +57,7 @@ function BarChart({ data }: { data: typeof REVENUE_VS_TARGETS }) {
         const targetW = (d.target / max) * 100;
         return (
           <div key={d.month} className="flex items-center gap-3">
-            <span className="w-10 shrink-0 text-xs font-medium text-slate-600">{d.month}</span>
+            <span className="w-10 shrink-0 text-xs font-medium text-slate-700">{d.month}</span>
             <div className="flex min-w-0 flex-1 items-center gap-1">
               <div
                 className="h-5 rounded bg-emerald-600"
@@ -68,13 +68,13 @@ function BarChart({ data }: { data: typeof REVENUE_VS_TARGETS }) {
                 style={{ width: `${targetW}%`, minWidth: d.target > 0 ? 6 : 0 }}
               />
             </div>
-            <span className="w-20 shrink-0 text-right text-xs text-slate-500">
+            <span className="w-20 shrink-0 text-right text-xs text-slate-700">
               {d.revenue}k / {d.target}k
             </span>
           </div>
         );
       })}
-      <div className="flex gap-4 pt-2 text-xs text-slate-500">
+      <div className="flex gap-4 pt-2 text-xs text-slate-700">
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-4 rounded bg-emerald-600" /> Revenue
         </span>
@@ -116,12 +116,12 @@ function PieChart({ data }: { data: typeof PAYMENT_METHODS }) {
       </svg>
       <ul className="space-y-2">
         {data.map((d) => (
-          <li key={d.label} className="flex items-center justify-between gap-4 text-sm">
-            <span className="flex items-center gap-2">
+          <li key={d.label} className="flex items-center justify-between gap-4 text-sm text-slate-900">
+            <span className="flex items-center gap-2 font-medium text-slate-700">
               <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: d.color }} />
               {d.label}
             </span>
-            <span className="font-medium text-slate-700">{d.value}%</span>
+            <span className="font-medium text-slate-900">{d.value}%</span>
           </li>
         ))}
       </ul>
@@ -168,14 +168,14 @@ export default function FinanceDashboardPage() {
 
       {/* Charts */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Charts</h2>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-700">Charts</h2>
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="p-4 shadow-sm">
-            <h3 className="mb-4 text-sm font-medium text-slate-700">Revenue vs Targets (last 6 months)</h3>
+          <Card className="p-4 shadow-sm bg-white/80">
+            <h3 className="mb-4 text-sm font-medium text-slate-900">Revenue vs Targets (last 6 months)</h3>
             <BarChart data={REVENUE_VS_TARGETS} />
           </Card>
-          <Card className="p-4 shadow-sm">
-            <h3 className="mb-4 text-sm font-medium text-slate-700">Payment Methods</h3>
+          <Card className="p-4 shadow-sm bg-white/80">
+            <h3 className="mb-4 text-sm font-medium text-slate-900">Payment Methods</h3>
             <PieChart data={PAYMENT_METHODS} />
           </Card>
         </div>

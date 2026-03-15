@@ -19,6 +19,7 @@ const NAV_ITEMS: Array<{ href: string; label: string; tooltip: string; icon: Rea
   { href: "/finance/blocking", label: "Blocking System", tooltip: "Access Control", icon: <BlockingIcon /> },
   { href: "/finance/reports", label: "Reports & Analytics", tooltip: "Financial Insights", icon: <ReportsIcon /> },
   { href: "/finance/audit", label: "Audit & Logs", tooltip: "Transaction History", icon: <AuditIcon /> },
+  { href: "/finance/settings", label: "Settings", tooltip: "Language, notifications, security", icon: <SettingsIcon /> },
 ];
 
 function DashboardIcon() {
@@ -74,6 +75,14 @@ function AuditIcon() {
   return (
     <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+    </svg>
+  );
+}
+function SettingsIcon() {
+  return (
+    <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   );
 }
@@ -160,31 +169,66 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
   };
 
   const sidebarContent = (
-    <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3 sm:p-4 overscroll-contain touch-pan-y" aria-label="Finance navigation">
-      {NAV_ITEMS.map((item) => (
+    <>
+      <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-3 sm:p-4 overscroll-contain touch-pan-y" aria-label="Finance navigation">
+        {NAV_ITEMS.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            title={showCollapsed ? item.tooltip : undefined}
+            aria-current={isActive(item.href) ? "page" : undefined}
+            className={cn(
+              "flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors touch-manipulation",
+              isActive(item.href)
+                ? "bg-emerald-400 text-emerald-900"
+                : "text-emerald-100 hover:bg-emerald-800 hover:text-white",
+              showCollapsed && "justify-center px-2",
+            )}
+          >
+            <span className={cn("shrink-0", isActive(item.href) ? "text-emerald-900" : "text-emerald-200")}>{item.icon}</span>
+            {!showCollapsed && <span>{item.label}</span>}
+          </Link>
+        ))}
+      </nav>
+      <div className="mt-auto shrink-0 border-t border-emerald-800 p-3 sm:p-4">
         <Link
-          key={item.href}
-          href={item.href}
-          title={showCollapsed ? item.tooltip : undefined}
-          aria-current={isActive(item.href) ? "page" : undefined}
+          href="/finance/profile"
           className={cn(
-            "flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors touch-manipulation",
-            isActive(item.href)
-              ? "bg-emerald-50 text-emerald-700"
-              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+            "flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-emerald-100 transition-colors hover:bg-emerald-800 hover:text-white touch-manipulation",
             showCollapsed && "justify-center px-2",
           )}
+          title={showCollapsed ? "Profile / Settings" : undefined}
         >
-          <span className={cn("shrink-0", isActive(item.href) ? "text-emerald-700" : "text-slate-500")}>{item.icon}</span>
-          {!showCollapsed && <span>{item.label}</span>}
+          <span className="shrink-0 text-emerald-200">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.116 17.116 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+          </span>
+          {!showCollapsed && <span>Profile</span>}
         </Link>
-      ))}
-    </nav>
+        <button
+          type="button"
+          className={cn(
+            "mt-1 flex w-full min-h-[44px] items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-emerald-100 transition-colors hover:bg-emerald-800 hover:text-white touch-manipulation",
+            showCollapsed && "justify-center px-2",
+          )}
+          title={showCollapsed ? "Log out" : undefined}
+          onClick={() => alert("Log out (Demo)")}
+        >
+          <span className="shrink-0 text-emerald-200">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v3.75M15.75 9l-3-3m0 0l-3 3m3-3h8.25M8.25 21H5.625a2.25 2.25 0 01-2.25-2.25V5.625a2.25 2.25 0 012.25-2.25h2.625M15.75 21h2.625a2.25 2.25 0 002.25-2.25V15.75m-6-6l3-3m0 0l3 3m-3-3v12" />
+            </svg>
+          </span>
+          {!showCollapsed && <span>Log out</span>}
+        </button>
+      </div>
+    </>
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
-      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 shadow-sm print:hidden sm:gap-4 sm:px-4">
+    <div className="flex h-screen flex-col bg-slate-50">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-emerald-50/30 px-3 shadow-sm print:hidden sm:gap-4 sm:px-4">
         <Button
           type="button"
           variant="secondary"
@@ -253,7 +297,7 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
         <span className="hidden shrink-0 text-sm font-medium text-slate-600 sm:inline">Finance</span>
       </header>
 
-      <div className="relative flex flex-1 overflow-hidden">
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
         {mobileOpen && (
           <div
             className="fixed inset-0 z-40 bg-slate-900/20 lg:hidden"
@@ -263,8 +307,8 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
         )}
         <aside
           className={cn(
-            "flex shrink-0 flex-col border-r border-slate-200 bg-white transition-[width] duration-200 ease-out print:hidden",
-            "fixed left-0 top-14 z-40 h-[calc(100vh-3.5rem)] w-64 md:w-72 lg:relative lg:top-0 lg:h-full",
+            "flex flex-col shrink-0 border-r border-emerald-800 bg-emerald-900 transition-[width] duration-200 ease-out print:hidden",
+            "fixed left-0 top-14 z-40 h-[calc(100vh-3.5rem)] w-64 md:w-72 lg:relative lg:top-0 lg:h-full lg:max-h-full",
             collapsed ? "lg:w-16" : "lg:w-56",
             mobileOpen ? "flex" : "hidden lg:flex",
           )}
@@ -272,7 +316,7 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
           {sidebarContent}
         </aside>
 
-        <main className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
+        <main data-finance-panel className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden bg-emerald-50/30 p-4 sm:p-6">
           {children}
         </main>
       </div>

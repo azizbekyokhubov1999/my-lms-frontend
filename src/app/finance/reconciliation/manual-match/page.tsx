@@ -1,10 +1,30 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 
 import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
+
+const STORAGE_KEY = "finance-reconciliation-match-comments";
+
+export type StoredMatch = { lmsId: string; oneCId: string; comment: string; savedAt: string };
+
+function getStoredMatches(): StoredMatch[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as StoredMatch[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function setStoredMatch(match: StoredMatch) {
+  const prev = getStoredMatches();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...prev, match]));
+}
 
 function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
@@ -29,6 +49,7 @@ interface BankRecord {
 const MOCK_LMS_UNMATCHED: LMSPayment[] = [
   { id: "lms2", transactionId: "TXN-2840", studentName: "Ivan Kozlov", amount: 38000, date: "2026-03-06" },
   { id: "lms4", transactionId: "TXN-2838", studentName: "Dmitri Volkov", amount: 29000, date: "2026-03-05" },
+  { id: "lms5", transactionId: "TXN-2837", studentName: "Elena Novikova", amount: 60000, date: "2026-03-04" },
 ];
 
 const MOCK_1C_UNMATCHED: BankRecord[] = [
@@ -36,19 +57,38 @@ const MOCK_1C_UNMATCHED: BankRecord[] = [
   { id: "1c4", reference: "REF-88424", amount: 38000, date: "2026-03-06", description: "Ivan Kozlov" },
 ];
 
+const ALL_LMS = MOCK_LMS_UNMATCHED;
+const ALL_1C = MOCK_1C_UNMATCHED;
+
 export default function ManualMatchPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const lmsParam = searchParams.get("lms");
+  const cParam = searchParams.get("c");
+
   const [selectedLms, setSelectedLms] = React.useState<string | null>(null);
   const [selected1c, setSelected1c] = React.useState<string | null>(null);
-  const [linked, setLinked] = React.useState<Array<{ lms: string; onec: string }>>([]);
+  const [comment, setComment] = React.useState("");
+  const linked = getStoredMatches().map((m) => ({ lms: m.lmsId, onec: m.oneCId }));
 
-  const handleLink = () => {
-    if (!selectedLms || !selected1c) return;
-    setLinked((prev) => [...prev, { lms: selectedLms, onec: selected1c }]);
-    setSelectedLms(null);
-    setSelected1c(null);
+  React.useEffect(() => {
+    if (lmsParam && ALL_LMS.some((p) => p.id === lmsParam)) setSelectedLms(lmsParam);
+    if (cParam && ALL_1C.some((r) => r.id === cParam)) setSelected1c(cParam);
+  }, [lmsParam, cParam]);
+
+  const handleSave = () => {
+    if (!selectedLms || !selected1c || !comment.trim()) return;
+    setStoredMatch({
+      lmsId: selectedLms,
+      oneCId: selected1c,
+      comment: comment.trim(),
+      savedAt: new Date().toISOString(),
+    });
+    router.push("/finance/reconciliation");
   };
 
   const formatAmount = (n: number) => `${n.toLocaleString()} ₸`;
+  const canSave = Boolean(selectedLms && selected1c && comment.trim());
 
   return (
     <div className="space-y-6">
@@ -132,23 +172,37 @@ export default function ManualMatchPage() {
         </Card>
       </div>
 
+      <Card className="p-4">
+        <label className="block text-sm font-semibold text-slate-700">
+          Comments <span className="text-red-500">*</span>
+        </label>
+        <p className="mt-0.5 text-xs text-slate-500">Required. Explain why this manual match was made.</p>
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="e.g. Bank fee adjusted; student paid in cash and we matched to bank transfer."
+          rows={3}
+          className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+        />
+      </Card>
+
       <div className="flex items-center justify-center gap-4 rounded-lg border border-slate-200 bg-slate-50/50 p-4">
         <Button
           type="button"
           className="bg-emerald-600 hover:bg-emerald-700"
-          onClick={handleLink}
-          disabled={!selectedLms || !selected1c}
+          onClick={handleSave}
+          disabled={!canSave}
         >
-          Link Selected
+          Save
         </Button>
         <span className="text-sm text-slate-600">
-          {selectedLms && selected1c ? "Ready to link" : "Select one from each column"}
+          {!comment.trim() ? "Add a comment to enable Save" : selectedLms && selected1c ? "Ready to save" : "Select one from each column"}
         </span>
       </div>
 
       {linked.length > 0 && (
         <Card className="p-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Linked (this session)</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Already linked (saved)</h2>
           <ul className="mt-2 space-y-1 text-sm text-slate-700">
             {linked.map((l, i) => (
               <li key={i}>

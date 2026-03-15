@@ -141,12 +141,12 @@ export default function ContractsListPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
+                    <Link
+                      href={`/finance/contracts/${c.id}`}
                       className="text-sm font-medium text-emerald-700 hover:underline"
                     >
                       View
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))}

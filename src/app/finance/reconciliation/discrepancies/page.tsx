@@ -3,7 +3,6 @@
 import Link from "next/link";
 import * as React from "react";
 
-import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
 
 function cn(...classes: Array<string | false | null | undefined>) {
@@ -18,14 +17,16 @@ interface Discrepancy {
   description: string;
   lmsRef: string;
   oneCRef: string;
+  lmsId: string | null;
+  oneCId: string | null;
   detail: string;
   createdAt: string;
 }
 
 const MOCK_DISCREPANCIES: Discrepancy[] = [
-  { id: "d1", type: "amount_mismatch", description: "Amount mismatch", lmsRef: "TXN-2840", oneCRef: "REF-88424", detail: "LMS: 38,000 ₸ vs 1C: 39,000 ₸", createdAt: "2026-03-06" },
-  { id: "d2", type: "duplicate_id", description: "Duplicate transaction ID", lmsRef: "TXN-2837", oneCRef: "REF-88423", detail: "Same ID in multiple 1C entries", createdAt: "2026-03-05" },
-  { id: "d3", type: "missing_record", description: "No 1C record", lmsRef: "TXN-2838", oneCRef: "—", detail: "Payment recorded in LMS but not in bank statement", createdAt: "2026-03-05" },
+  { id: "d1", type: "amount_mismatch", description: "Amount mismatch", lmsRef: "TXN-2840", oneCRef: "REF-88424", lmsId: "lms2", oneCId: "1c4", detail: "LMS: 38,000 ₸ vs 1C: 39,000 ₸", createdAt: "2026-03-06" },
+  { id: "d2", type: "duplicate_id", description: "Duplicate transaction ID", lmsRef: "TXN-2837", oneCRef: "REF-88423", lmsId: "lms5", oneCId: "1c3", detail: "Same ID in multiple 1C entries", createdAt: "2026-03-05" },
+  { id: "d3", type: "missing_record", description: "No 1C record", lmsRef: "TXN-2838", oneCRef: "—", lmsId: "lms4", oneCId: null, detail: "Payment recorded in LMS but not in bank statement", createdAt: "2026-03-05" },
 ];
 
 const TYPE_LABELS: Record<DiscrepancyType, string> = {
@@ -36,13 +37,7 @@ const TYPE_LABELS: Record<DiscrepancyType, string> = {
 };
 
 export default function DiscrepanciesPage() {
-  const [resolved, setResolved] = React.useState<Set<string>>(new Set());
-
-  const handleResolve = (id: string) => {
-    setResolved((prev) => new Set([...prev, id]));
-  };
-
-  const open = MOCK_DISCREPANCIES.filter((d) => !resolved.has(d.id));
+  const open = MOCK_DISCREPANCIES;
 
   return (
     <div className="space-y-6">
@@ -84,14 +79,19 @@ export default function DiscrepanciesPage() {
                   <td className="px-4 py-3 text-slate-600">{d.detail}</td>
                   <td className="px-4 py-3 text-slate-600">{d.createdAt}</td>
                   <td className="px-4 py-3 text-right">
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700"
-                      onClick={() => handleResolve(d.id)}
+                    <Link
+                      href={
+                        d.lmsId != null || d.oneCId != null
+                          ? `/finance/reconciliation/manual-match?${new URLSearchParams({
+                              ...(d.lmsId && { lms: d.lmsId }),
+                              ...(d.oneCId && { c: d.oneCId }),
+                            }).toString()}`
+                          : "/finance/reconciliation/manual-match"
+                      }
+                      className="inline-flex h-8 items-center justify-center rounded-md bg-emerald-600 px-3 text-sm font-medium text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                     >
                       Resolve Manually
-                    </Button>
+                    </Link>
                   </td>
                 </tr>
               ))}

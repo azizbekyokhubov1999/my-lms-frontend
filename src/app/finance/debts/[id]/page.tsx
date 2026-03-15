@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import * as React from "react";
 
-import { Card } from "../../../../components/ui/Card";
+import { Button } from "../../../components/ui/Button";
+import { Card } from "../../../components/ui/Card";
 
 interface MissedInstallment {
   id: string;
@@ -78,8 +79,8 @@ export default function StudentDebtPage() {
   const id = typeof params?.id === "string" ? params.id : "";
 
   const student = id ? MOCK_STUDENTS[id] : null;
-  const missed = (id && MOCK_MISSED[id]) ?? [];
-  const timeline = (id && MOCK_TIMELINE[id]) ?? [];
+  const missed = id ? (MOCK_MISSED[id] ?? []) : [];
+  const timeline = id ? (MOCK_TIMELINE[id] ?? []) : [];
 
   const formatAmount = (n: number) => `${n.toLocaleString()} ₸`;
 
@@ -100,12 +101,29 @@ export default function StudentDebtPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/finance/debts" className="text-sm font-medium text-slate-600 hover:text-slate-900">
-          ← Debts
-        </Link>
-        <h1 className="mt-1 text-2xl font-semibold text-slate-900">{student.name}</h1>
-        <p className="mt-0.5 text-sm text-slate-600">Student ID: {student.studentId}</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <Link href="/finance/debts" className="text-sm font-medium text-slate-600 hover:text-slate-900">
+            ← Debts
+          </Link>
+          <h1 className="mt-1 text-2xl font-semibold text-slate-900">{student.name}</h1>
+          <p className="mt-0.5 text-sm text-slate-600">Student ID: {student.studentId}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            className="bg-amber-600 hover:bg-amber-700 focus-visible:ring-amber-500"
+            onClick={() => alert(`Reminder sent to ${student.name} (Demo).`)}
+          >
+            Send Reminder
+          </Button>
+          <Link
+            href="/finance/debts/payment-plans"
+            className="inline-flex h-10 items-center justify-center rounded-md border border-emerald-600 px-4 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          >
+            Create Payment Plan
+          </Link>
+        </div>
       </div>
 
       {/* Summary */}

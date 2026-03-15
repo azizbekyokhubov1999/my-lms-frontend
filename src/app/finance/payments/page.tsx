@@ -61,12 +61,20 @@ export default function PaymentsListPage() {
             Tracking & recording. View all payment transactions and status.
           </p>
         </div>
-        <Link
-          href="/finance/payments/record"
-          className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-4 text-sm font-medium text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
-        >
-          Record Payment
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/finance/payments/history"
+            className="inline-flex h-10 items-center justify-center rounded-md border border-emerald-600 px-4 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50"
+          >
+            History
+          </Link>
+          <Link
+            href="/finance/payments/record"
+            className="inline-flex h-10 items-center justify-center rounded-md bg-emerald-600 px-4 text-sm font-medium text-white transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          >
+            Record Payment
+          </Link>
+        </div>
       </div>
 
       <Card className="p-4">
@@ -100,7 +108,7 @@ export default function PaymentsListPage() {
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Method</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Date</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Status</th>
-                <th className="w-20 px-4 py-3 text-right font-medium text-slate-600">Actions</th>
+                <th className="px-4 py-3 text-right font-medium text-slate-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -127,12 +135,21 @@ export default function PaymentsListPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/finance/payments/${p.id}`}
-                      className="text-sm font-medium text-emerald-700 hover:underline"
-                    >
-                      View Receipt
-                    </Link>
+                    <div className="flex justify-end gap-2">
+                      <Link
+                        href={`/finance/payments/${p.id}`}
+                        className="text-sm font-medium text-emerald-700 hover:underline"
+                      >
+                        View
+                      </Link>
+                      <span className="text-slate-300">|</span>
+                      <Link
+                        href={`/finance/payments/${p.id}#receipt`}
+                        className="text-sm font-medium text-slate-600 hover:underline"
+                      >
+                        View Receipt
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}

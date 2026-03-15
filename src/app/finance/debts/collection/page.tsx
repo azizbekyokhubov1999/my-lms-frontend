@@ -58,14 +58,22 @@ export default function DebtCollectionPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/finance/debts" className="text-sm font-medium text-slate-600 hover:text-slate-900">
-          ← Debt Management
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <Link href="/finance/debts" className="text-sm font-medium text-slate-600 hover:text-slate-900">
+            ← Debt Management
+          </Link>
+          <h1 className="mt-1 text-2xl font-semibold text-slate-900">Debt Collection Hub</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Send payment reminders and track Promise to Pay dates.
+          </p>
+        </div>
+        <Link
+          href="/finance/debts/collection/promises"
+          className="inline-flex h-10 items-center justify-center rounded-md border border-emerald-600 px-4 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+        >
+          View Promises List
         </Link>
-        <h1 className="mt-1 text-2xl font-semibold text-slate-900">Debt Collection Hub</h1>
-        <p className="mt-1 text-sm text-slate-600">
-          Send payment reminders and track Promise to Pay dates.
-        </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
