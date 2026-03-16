@@ -1,53 +1,50 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import * as React from "react";
 
-import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
+
+import {
+  getAppeals,
+  type Appeal,
+  type AppealStatus,
+  type AppealType,
+} from "./appealsData";
 
 function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
-type AppealType = "grade" | "disciplinary";
-type AppealStatus = "pending" | "under_review" | "approved" | "rejected";
-
-interface Appeal {
-  id: string;
-  studentName: string;
-  studentId: string;
-  type: AppealType;
-  subject: string;
-  submittedAt: string;
-  status: AppealStatus;
-  summary: string;
-  reviewedBy?: string;
-  reviewedAt?: string;
-  outcomeReason?: string;
-}
-
-const MOCK_APPEALS: Appeal[] = [
-  { id: "ap1", studentName: "Ivan Kozlov", studentId: "STU-10002", type: "grade", subject: "CS101 Mid-term", submittedAt: "2026-03-05", status: "pending", summary: "Student appeals grade; claims grading error on question 3." },
-  { id: "ap2", studentName: "Dmitri Volkov", studentId: "STU-10004", type: "disciplinary", subject: "Attendance warning", submittedAt: "2026-03-04", status: "under_review", summary: "Appeal against attendance-based warning. Medical documentation provided." },
-  { id: "ap3", studentName: "Elena Novikova", studentId: "STU-10005", type: "grade", subject: "SE201 Assignment", submittedAt: "2026-03-01", status: "approved", summary: "Re-grade request.", reviewedBy: "Dr. Sokolova", reviewedAt: "2026-03-03 11:00", outcomeReason: "Partial marks restored after re-check." },
-];
-
 const TYPE_LABELS: Record<AppealType, string> = { grade: "Grade", disciplinary: "Disciplinary" };
+
 const STATUS_STYLES: Record<AppealStatus, string> = {
   pending: "bg-amber-100 text-amber-800",
   under_review: "bg-violet-100 text-violet-800",
-  approved: "bg-emerald-100 text-emerald-800",
-  rejected: "bg-rose-100 text-rose-800",
+  resolved: "bg-slate-100 text-slate-700",
 };
 
+function statusLabel(a: Appeal): string {
+  if (a.status === "resolved" && a.outcome) {
+    return `Resolved (${a.outcome === "approved" ? "Approved" : "Rejected"})`;
+  }
+  return a.status.replace("_", " ");
+}
+
 export default function AppealsPage() {
+  const pathname = usePathname();
+  const [appeals, setAppeals] = React.useState<Appeal[]>([]);
   const [filterStatus, setFilterStatus] = React.useState<AppealStatus | "">("");
 
+  React.useEffect(() => {
+    setAppeals(getAppeals());
+  }, [pathname]);
+
   const filtered = React.useMemo(() => {
-    if (!filterStatus) return MOCK_APPEALS;
-    return MOCK_APPEALS.filter((a) => a.status === filterStatus);
-  }, [filterStatus]);
+    if (!filterStatus) return appeals;
+    return appeals.filter((a) => a.status === filterStatus);
+  }, [appeals, filterStatus]);
 
   return (
     <div className="space-y-6">
@@ -71,8 +68,7 @@ export default function AppealsPage() {
           <option value="">All</option>
           <option value="pending">Pending</option>
           <option value="under_review">Under review</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
+          <option value="resolved">Resolved</option>
         </select>
       </div>
 
@@ -92,24 +88,20 @@ export default function AppealsPage() {
                 {a.reviewedBy && (
                   <p className="mt-1 text-xs text-slate-600">
                     <strong>Reviewed by:</strong> {a.reviewedBy} · {a.reviewedAt}
-                    {a.outcomeReason && <> · <strong>Why:</strong> {a.outcomeReason}</>}
+                    {a.officerFeedback && <> · <strong>Feedback:</strong> {a.officerFeedback}</>}
                   </p>
                 )}
               </div>
               <div className="flex items-center gap-2">
                 <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", STATUS_STYLES[a.status])}>
-                  {a.status.replace("_", " ")}
+                  {statusLabel(a)}
                 </span>
-                {(a.status === "pending" || a.status === "under_review") && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="bg-violet-600 hover:bg-violet-700"
-                    onClick={() => alert(`Open appeal workflow for ${a.subject} (Demo). Record decision and reason for audit.`)}
-                  >
-                    Review
-                  </Button>
-                )}
+                <Link
+                  href={`/academic/exceptions/appeals/${a.id}`}
+                  className="inline-flex h-8 items-center justify-center rounded-md bg-violet-600 px-3 text-xs font-medium text-white transition-colors hover:bg-violet-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+                >
+                  {a.status === "resolved" ? "View" : "Review"}
+                </Link>
               </div>
             </div>
           </Card>

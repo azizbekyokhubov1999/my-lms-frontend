@@ -12,6 +12,7 @@ function cn(...classes: Array<string | false | null | undefined>) {
 
 const NAV_ITEMS: Array<{ href: string; label: string; tooltip: string; icon: React.ReactNode }> = [
   { href: "/academic/dashboard", label: "Dashboard", tooltip: "Overview", icon: <DashboardIcon /> },
+  { href: "/academic/calendar", label: "Academic Calendar", tooltip: "Events, exams, holidays", icon: <CalendarIcon /> },
   { href: "/academic/programs", label: "Programs", tooltip: "Modules, Courses, Requirements", icon: <ProgramsIcon /> },
   { href: "/academic/groups", label: "Groups", tooltip: "Cohorts, Transfers", icon: <GroupsIcon /> },
   { href: "/academic/schedules", label: "Schedules", tooltip: "aSc Sync, Overrides", icon: <SchedulesIcon /> },
@@ -243,7 +244,7 @@ export default function AcademicLayout({ children }: { children: React.ReactNode
 
   return (
     <div className="flex h-screen flex-col bg-slate-50">
-      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-purple-50/50 px-3 shadow-sm print:hidden sm:gap-4 sm:px-4">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-purple-900 bg-purple-700 px-3 shadow-sm print:hidden sm:gap-4 sm:px-4">
         <Button
           type="button"
           variant="secondary"
