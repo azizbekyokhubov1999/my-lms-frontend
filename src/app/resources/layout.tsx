@@ -59,15 +59,15 @@ export default function ResourcesLayout({ children }: { children: React.ReactNod
             className={cn(
               "group flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               isActive(item.href)
-                ? "bg-teal-500 text-teal-950"
-                : "text-teal-50 hover:bg-teal-600 hover:text-white",
+                ? "bg-teal-600 text-white"
+                : "text-teal-100 hover:bg-teal-800 hover:text-white",
               showCollapsed && "justify-center px-2",
             )}
           >
             <span
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-md bg-teal-800 text-xs font-semibold text-teal-50",
-                isActive(item.href) && "bg-teal-50 text-teal-800",
+                isActive(item.href) && "bg-teal-50 text-teal-900",
               )}
             >
               {item.label[0]}
@@ -84,10 +84,26 @@ export default function ResourcesLayout({ children }: { children: React.ReactNod
         ))}
       </nav>
       <div className="mt-auto border-t border-teal-800 p-3 sm:p-4">
+        <Link
+          href="/resources/profile"
+          aria-current={pathname === "/resources/profile" ? "page" : undefined}
+          className={cn(
+            "flex min-h-[40px] w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-teal-100 transition-colors hover:bg-teal-800 hover:text-white",
+            showCollapsed && "justify-center px-2",
+            pathname === "/resources/profile" && "bg-teal-800 text-white",
+          )}
+        >
+          <span className="shrink-0">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+          </span>
+          {!showCollapsed && <span>Profile / Settings</span>}
+        </Link>
         <button
           type="button"
           className={cn(
-            "flex w-full min-h-[40px] items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-teal-100 transition-colors hover:bg-teal-600 hover:text-white",
+            "mt-1 flex w-full min-h-[40px] items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-teal-100 transition-colors hover:bg-teal-800 hover:text-white",
             showCollapsed && "justify-center px-2",
           )}
           onClick={() => alert("Log out (Demo)")}
@@ -151,7 +167,7 @@ export default function ResourcesLayout({ children }: { children: React.ReactNod
         )}
         <aside
           className={cn(
-            "flex min-h-screen flex-col shrink-0 border-r border-teal-800 bg-teal-700 transition-[width] duration-200 ease-out",
+            "flex min-h-screen flex-col shrink-0 border-r border-teal-800 bg-teal-900 transition-[width] duration-200 ease-out",
             "fixed left-0 top-14 z-40 h-[calc(100vh-3.5rem)] w-64 md:w-72 lg:relative lg:top-0 lg:h-full lg:min-h-screen lg:max-h-full",
             collapsed ? "lg:w-20" : "lg:w-64",
             mobileOpen ? "flex" : "hidden lg:flex",

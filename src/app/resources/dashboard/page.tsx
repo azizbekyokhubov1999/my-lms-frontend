@@ -200,7 +200,7 @@ export default function ResourcesDashboardPage() {
               />
               <Tooltip
                 contentStyle={{ borderRadius: "8px", border: "1px solid #99f6e4" }}
-                formatter={(value: number) => [value.toFixed(2), "Avg. score"]}
+                formatter={(value) => [value != null ? Number(value).toFixed(2) : "—", "Avg. score"]}
               />
               <Legend wrapperStyle={{ fontSize: "12px" }} />
               <Bar
