@@ -1,5 +1,17 @@
 "use client";
 
+import {
+  BarChart3,
+  Briefcase,
+  FileBarChart,
+  LayoutDashboard,
+  Replace,
+  Settings,
+  ShieldCheck,
+  Star,
+  UserCircle,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
@@ -10,15 +22,26 @@ function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
-const NAV_ITEMS: Array<{ href: string; label: string; description: string }> = [
-  { href: "/resources/dashboard", label: "Dashboard", description: "Overview" },
-  { href: "/resources/teachers", label: "Teachers", description: "Profiles, Verification, Import" },
-  { href: "/resources/assignments", label: "Assignments", description: "Course/Group, Co-teaching" },
-  { href: "/resources/workload", label: "Workload", description: "Hours, Overload alerts" },
-  { href: "/resources/performance", label: "Performance", description: "Metrics, Feedback, SLA" },
-  { href: "/resources/replacements", label: "Replacements", description: "Transition workflow, Content transfer" },
-  { href: "/resources/access", label: "Access", description: "Permissions, Revoke/Grant" },
-  { href: "/resources/reports", label: "Reports", description: "Utilization, Planning" },
+const NAV_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  "/resources/dashboard": LayoutDashboard,
+  "/resources/teachers": Users,
+  "/resources/assignments": Briefcase,
+  "/resources/workload": BarChart3,
+  "/resources/performance": Star,
+  "/resources/replacements": Replace,
+  "/resources/access": ShieldCheck,
+  "/resources/reports": FileBarChart,
+};
+
+const NAV_ITEMS: Array<{ href: string; label: string }> = [
+  { href: "/resources/dashboard", label: "Dashboard" },
+  { href: "/resources/teachers", label: "Teachers" },
+  { href: "/resources/assignments", label: "Assignments" },
+  { href: "/resources/workload", label: "Workload" },
+  { href: "/resources/performance", label: "Performance" },
+  { href: "/resources/replacements", label: "Replacements" },
+  { href: "/resources/access", label: "Access" },
+  { href: "/resources/reports", label: "Reports" },
 ];
 
 function MenuIcon() {
@@ -66,44 +89,65 @@ export default function ResourcesLayout({ children }: { children: React.ReactNod
           >
             <span
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-md bg-teal-800 text-xs font-semibold text-teal-50",
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-teal-800 text-teal-50",
                 isActive(item.href) && "bg-teal-50 text-teal-900",
               )}
             >
-              {item.label[0]}
+              {React.createElement(NAV_ICONS[item.href] ?? LayoutDashboard, { className: "h-4 w-4" })}
             </span>
-            {!showCollapsed && (
-              <span className="flex flex-col">
-                <span>{item.label}</span>
-                <span className="text-[11px] font-normal text-teal-100 group-hover:text-teal-50">
-                  {item.description}
-                </span>
-              </span>
-            )}
+            {!showCollapsed && <span>{item.label}</span>}
           </Link>
         ))}
       </nav>
-      <div className="mt-auto border-t border-teal-800 p-3 sm:p-4">
-        <Link
-          href="/resources/profile"
-          aria-current={pathname === "/resources/profile" ? "page" : undefined}
-          className={cn(
-            "flex min-h-[40px] w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-teal-100 transition-colors hover:bg-teal-800 hover:text-white",
-            showCollapsed && "justify-center px-2",
-            pathname === "/resources/profile" && "bg-teal-800 text-white",
-          )}
-        >
-          <span className="shrink-0">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-            </svg>
-          </span>
-          {!showCollapsed && <span>Profile / Settings</span>}
-        </Link>
+      <div className="mt-auto border-t border-teal-700 p-3 sm:p-4">
+        <div className="flex flex-col gap-1">
+          <Link
+            href="/resources/profile"
+            aria-current={pathname === "/resources/profile" ? "page" : undefined}
+            className={cn(
+              "group flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              isActive("/resources/profile")
+                ? "bg-teal-600 text-white"
+                : "text-teal-100 hover:bg-teal-800 hover:text-white",
+              showCollapsed && "justify-center px-2",
+            )}
+          >
+            <span
+              className={cn(
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-teal-800 text-teal-50",
+                isActive("/resources/profile") && "bg-teal-50 text-teal-900",
+              )}
+            >
+              <UserCircle className="h-4 w-4" />
+            </span>
+            {!showCollapsed && <span>Profile</span>}
+          </Link>
+          <Link
+            href="/resources/settings"
+            aria-current={pathname === "/resources/settings" ? "page" : undefined}
+            className={cn(
+              "group flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              isActive("/resources/settings")
+                ? "bg-teal-600 text-white"
+                : "text-teal-100 hover:bg-teal-800 hover:text-white",
+              showCollapsed && "justify-center px-2",
+            )}
+          >
+            <span
+              className={cn(
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-teal-800 text-teal-50",
+                isActive("/resources/settings") && "bg-teal-50 text-teal-900",
+              )}
+            >
+              <Settings className="h-4 w-4" />
+            </span>
+            {!showCollapsed && <span>Settings</span>}
+          </Link>
+        </div>
         <button
           type="button"
           className={cn(
-            "mt-1 flex w-full min-h-[40px] items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-teal-100 transition-colors hover:bg-teal-800 hover:text-white",
+            "mt-1 flex w-full min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-teal-100 transition-colors hover:bg-teal-800 hover:text-white",
             showCollapsed && "justify-center px-2",
           )}
           onClick={() => alert("Log out (Demo)")}
@@ -121,12 +165,12 @@ export default function ResourcesLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen flex-col bg-slate-50">
-      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-teal-800 bg-teal-700 px-3 shadow-sm sm:gap-4 sm:px-4">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-teal-800 bg-teal-700 px-3 sm:gap-4 sm:px-4">
         <Button
           type="button"
           variant="secondary"
           size="sm"
-          className="shrink-0 lg:hidden"
+          className="shrink-0 border-0 bg-teal-600 text-white hover:bg-teal-500 lg:hidden"
           onClick={() => setMobileOpen((o) => !o)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
         >
@@ -136,23 +180,15 @@ export default function ResourcesLayout({ children }: { children: React.ReactNod
           type="button"
           variant="secondary"
           size="sm"
-          className="hidden shrink-0 lg:inline-flex"
+          className="hidden shrink-0 border-0 bg-teal-600 text-white hover:bg-teal-500 lg:inline-flex"
           onClick={() => setCollapsed((c) => !c)}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <ChevronIcon left={!collapsed} />
         </Button>
-        <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="rounded-md bg-teal-600 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-teal-50">
-              Resources
-            </span>
-            <span className="hidden text-sm text-teal-100 sm:inline">
-              Teacher resources · workload · access
-            </span>
-          </div>
-          <span className="text-xs font-medium text-teal-100">
-            Department workspace
+        <div className="flex min-w-0 flex-1 items-center">
+          <span className="rounded-md bg-teal-600 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-teal-50">
+            Resources
           </span>
         </div>
       </header>
