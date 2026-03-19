@@ -2,29 +2,53 @@
 
 import Link from "next/link";
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
-import { useAuth } from "@/hooks/useAuth";
+import { registerUser } from "@/services/authService";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
 
 export default function RegisterPage() {
-  const { registerApplicant } = useAuth();
-  const [fullName, setFullName] = React.useState("");
+  const router = useRouter();
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [email, setEmail] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setSuccessMessage(null);
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
     setIsSubmitting(true);
 
     try {
-      const result = await registerApplicant(fullName, phone, password);
-      if (result.success) return;
-      setError(result.error ?? "Registration failed.");
+      const msg = "OTP sent to Telegram group. Please check it.";
+      const payload = {
+        firstName,
+        lastName,
+        email,
+        phone,
+        password,
+        confirmPassword,
+      };
+
+      await registerUser(payload);
+
+      setSuccessMessage(msg);
+      window.setTimeout(() => router.push(`/auth/otp?phone=${encodeURIComponent(phone)}`), 800);
+    } catch (err: any) {
+      const msg = err?.message ?? "Registration failed.";
+      setError(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -48,19 +72,48 @@ export default function RegisterPage() {
               {error}
             </p>
           )}
+          {successMessage && (
+            <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+              {successMessage}
+            </p>
+          )}
 
           <Input
-            label="Full Name"
+            label="First Name"
+            name="firstName"
             type="text"
-            autoComplete="name"
-            placeholder="Jane Doe"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            autoComplete="given-name"
+            placeholder="Jane"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             required
           />
 
           <Input
-            label="Phone Number (Primary ID)"
+            label="Last Name"
+            name="lastName"
+            type="text"
+            autoComplete="family-name"
+            placeholder="Doe"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
+
+          <Input
+            label="Email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="jane.doe@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          <Input
+            label="Phone"
+            name="phone"
             type="tel"
             autoComplete="tel"
             placeholder="+1 (555) 000-0000"
@@ -72,6 +125,7 @@ export default function RegisterPage() {
 
           <Input
             label="Password"
+            name="password"
             type="password"
             autoComplete="new-password"
             placeholder="••••••••"
@@ -82,13 +136,26 @@ export default function RegisterPage() {
             helperText="At least 8 characters."
           />
 
+          <Input
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            minLength={8}
+            required
+            helperText="Must match the password above."
+          />
+
           <Button
             type="submit"
             variant="primary"
-            disabled={isSubmitting || password.length < 8}
+            disabled={isSubmitting || password.length < 8 || confirmPassword.length < 8 || password !== confirmPassword}
             className="mt-2 w-full"
           >
-            {isSubmitting ? "Registering..." : "Register"}
+            {isSubmitting ? "Sending..." : "Register"}
           </Button>
         </form>
 

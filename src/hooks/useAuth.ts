@@ -9,7 +9,8 @@ export function useAuth() {
   const { user, isAuthenticated, isLoading, login, registerApplicant, logout, upgradeApplicantToStudent } =
     useAuthContext();
 
-  const role: AuthRole = user?.role ?? "STUDENT";
+  // Role-based access control is not enforced right now; keep a stable role value.
+  const role: AuthRole = "STUDENT";
 
   const setRole = React.useCallback(() => {
     // Role is derived from login; changing it would require re-login.

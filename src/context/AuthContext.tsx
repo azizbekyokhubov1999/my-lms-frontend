@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import * as React from "react";
 
 export type AuthRole = "STUDENT" | "TEACHER" | "AQAD" | "ADMIN" | "APPLICANT";
@@ -60,21 +59,7 @@ function isStaffRole(role: AuthRole): boolean {
   return role === "AQAD" || role === "TEACHER" || role === "ADMIN";
 }
 
-function getRedirectForRole(role: AuthRole): string {
-  switch (role) {
-    case "APPLICANT":
-      return "/admission/status";
-    case "AQAD":
-    case "ADMIN":
-      return "/aqad";
-    case "TEACHER":
-      return "/teacher";
-    case "STUDENT":
-      return "/student";
-    default:
-      return "/student";
-  }
-}
+// Role-based redirects removed to allow free navigation via URL.
 
 export type LoginResult =
   | { success: true }
@@ -98,14 +83,11 @@ interface AuthContextValue {
   logout: () => void;
   /** Upgrade APPLICANT to STUDENT after contract signing */
   upgradeApplicantToStudent: () => void;
-  /** Dev only: switch role without full login */
-  devSwitchRole?: (role: AuthRole) => void;
 }
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const [user, setUser] = React.useState<AuthSession | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -137,7 +119,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
         setRoleCookie("APPLICANT");
-        router.push("/admission/status");
         return { success: true };
       }
 
@@ -150,7 +131,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
         setRoleCookie("STUDENT");
-        router.push("/student");
         return { success: true };
       }
 
@@ -176,13 +156,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
         setRoleCookie(role);
-        router.push(getRedirectForRole(role));
         return { success: true };
       }
 
       return { success: false, error: "Invalid login type." };
     },
-    [router]
+    []
   );
 
   const registerApplicant = React.useCallback(
@@ -206,18 +185,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
       setRoleCookie("APPLICANT");
-      router.push("/auth/login");
       return { success: true };
     },
-    [router]
+    []
   );
 
   const logout = React.useCallback(() => {
     setUser(null);
     localStorage.removeItem(STORAGE_KEY);
     setRoleCookie(null);
-    router.push("/auth/login");
-  }, [router]);
+  }, []);
 
   const upgradeApplicantToStudent = React.useCallback(() => {
     setUser((prev) => {
@@ -236,35 +213,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const devSwitchRole = React.useCallback(
-    (role: AuthRole) => {
-      const mockEmails: Record<AuthRole, string> = {
-        STUDENT: "student@student.university.edu",
-        TEACHER: "teacher@university.edu",
-        AQAD: "aqad@university.edu",
-        ADMIN: "admin@university.edu",
-        APPLICANT: "+1234567890",
-      };
-      const session: AuthSession =
-        role === "APPLICANT"
-          ? { role, phone: mockEmails[role] }
-          : { role, email: mockEmails[role] };
-      setUser(session);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-      setRoleCookie(role);
-      router.push(
-        role === "APPLICANT"
-          ? "/admission/status"
-          : role === "AQAD"
-            ? "/aqad"
-            : role === "TEACHER"
-              ? "/teacher"
-              : "/student"
-      );
-    },
-    [router]
-  );
-
   const value: AuthContextValue = {
     user,
     isAuthenticated: !!user,
@@ -273,7 +221,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     registerApplicant,
     logout,
     upgradeApplicantToStudent,
-    devSwitchRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
