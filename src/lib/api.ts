@@ -1,6 +1,13 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosHeaders,
+  type AxiosError,
+  type InternalAxiosRequestConfig,
+} from "axios";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "";
+
+/** Must match keys used after login / OTP (see login & OTP pages). */
+const TOKEN_STORAGE_KEY = "token";
 
 export const api = axios.create({
   baseURL,
@@ -11,6 +18,16 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Attach JWT for authenticated API calls (browser only — no localStorage on server).
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+      if (token) {
+        const headers = AxiosHeaders.from(config.headers ?? {});
+        headers.set("Authorization", `Bearer ${token}`);
+        config.headers = headers;
+      }
+    }
+
     const method = (config.method ?? "GET").toUpperCase();
     // Keep logs small; response data can be large.
     console.log("[api] request", method, config.url);

@@ -45,9 +45,15 @@ export default function RegisterPage() {
       await registerUser(payload);
 
       setSuccessMessage(msg);
-      window.setTimeout(() => router.push(`/auth/otp?phone=${encodeURIComponent(phone)}`), 800);
-    } catch (err: any) {
-      const msg = err?.message ?? "Registration failed.";
+      window.setTimeout(
+        () =>
+          router.push(
+            `/auth/otp?phone=${encodeURIComponent(phone)}&email=${encodeURIComponent(email)}`,
+          ),
+        800,
+      );
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Registration failed.";
       setError(msg);
     } finally {
       setIsSubmitting(false);
