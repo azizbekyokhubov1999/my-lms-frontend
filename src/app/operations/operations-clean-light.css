@@ -1,0 +1,79 @@
+/* Clean Light theme overrides scoped to the /operations area.
+   This is intentionally broad to guarantee readability across the existing widgets. */
+
+.operations-clean-light {
+  color: rgb(15 23 42) !important; /* slate-900 */
+}
+
+/* Backgrounds: neutralize dark slate backgrounds used across the modules. */
+.operations-clean-light [class*="bg-slate-950"],
+.operations-clean-light [class*="bg-slate-900"],
+.operations-clean-light [class*="bg-slate-800"],
+.operations-clean-light [class*="bg-slate-900/"],
+.operations-clean-light [class*="bg-slate-950/"] {
+  background-color: rgb(255 255 255) !important;
+}
+
+/* Also handle inline-like variants with opacity classes. */
+.operations-clean-light [class*="bg-slate-950/"],
+.operations-clean-light [class*="bg-slate-900/"] {
+  --tw-bg-opacity: 1 !important;
+}
+
+/* Text: make dark text for slate-100/200/300/400 variants */
+.operations-clean-light [class*="text-slate-100/70"],
+.operations-clean-light [class*="text-slate-100/60"],
+.operations-clean-light [class*="text-slate-100/50"],
+.operations-clean-light [class*="text-slate-100/80"],
+.operations-clean-light [class*="text-slate-100/90"] {
+  color: rgb(71 85 105) !important; /* slate-600 */
+}
+
+.operations-clean-light [class*="text-slate-100"] {
+  color: rgb(15 23 42) !important; /* slate-900 */
+}
+
+.operations-clean-light [class*="text-slate-200"],
+.operations-clean-light [class*="text-slate-300"],
+.operations-clean-light [class*="text-slate-400"],
+.operations-clean-light [class*="text-slate-500"] {
+  color: rgb(71 85 105) !important; /* slate-600 */
+}
+
+/* Light “status” text colors (emerald/amber/rose/indigo) become dark for readability */
+.operations-clean-light [class*="text-emerald-100"],
+.operations-clean-light [class*="text-indigo-100"],
+.operations-clean-light [class*="text-indigo-200"],
+.operations-clean-light [class*="text-amber-100"],
+.operations-clean-light [class*="text-amber-200"],
+.operations-clean-light [class*="text-rose-100"],
+.operations-clean-light [class*="text-rose-200"],
+.operations-clean-light [class*="text-rose-300"],
+.operations-clean-light [class*="text-rose-500"],
+.operations-clean-light [class*="text-indigo-300"] {
+  color: rgb(15 23 42) !important; /* slate-900 */
+}
+
+/* Border dark slates to light borders where needed (keep indigo accents intact). */
+.operations-clean-light [class*="border-slate-800"],
+.operations-clean-light [class*="border-slate-900"] {
+  border-color: rgb(226 232 240) !important; /* slate-200 */
+}
+
+/* Inputs placeholders etc */
+.operations-clean-light [class*="placeholder:text-slate-500"] {
+  color: rgb(100 116 139) !important; /* slate-500 */
+}
+
+/* Recharts: force SVG text to dark so chart labels remain readable on light bg. */
+.operations-clean-light svg text {
+  fill: rgb(15 23 42) !important;
+}
+
+.operations-clean-light .recharts-default-tooltip,
+.operations-clean-light .recharts-tooltip-wrapper {
+  background-color: rgb(255 255 255) !important;
+  color: rgb(15 23 42) !important;
+  border-color: rgba(129, 140, 248, 0.35) !important;
+}
+
