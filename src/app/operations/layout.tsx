@@ -2,9 +2,12 @@
 
 import {
   Activity,
+  ChevronLeft,
   Cpu,
+  Menu,
   ShieldAlert,
   ShieldCheck,
+  X,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -63,23 +66,75 @@ export default function OperationsLayout({
 }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   const isActive = (href: string) =>
     pathname === href || pathname?.startsWith(href + "/");
 
   const closeMobile = React.useCallback(() => setMobileOpen(false), []);
 
+  const toggleCollapse = React.useCallback(() => {
+    setIsCollapsed((c) => !c);
+  }, []);
+
+  React.useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => {
+      if (mq.matches) setMobileOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  const renderLeaf = (leaf: NavLeaf) => {
+    const Icon = ICONS[leaf.icon];
+    const active = isActive(leaf.href);
+
+    return (
+      <Link
+        key={leaf.href}
+        href={leaf.href}
+        title={leaf.label}
+        onClick={closeMobile}
+        aria-current={active ? "page" : undefined}
+        className={cn(
+          "group relative flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-all duration-300",
+          isCollapsed && "lg:justify-center lg:gap-0 lg:px-2",
+          active
+            ? "border-indigo-400 bg-indigo-50 text-slate-900"
+            : "border-slate-200 bg-white text-slate-700 hover:border-indigo-400/60 hover:bg-indigo-50/80 hover:text-slate-900",
+        )}
+      >
+        <Icon
+          className={cn(
+            "h-4 w-4 shrink-0 transition-colors duration-300",
+            active ? "text-indigo-400" : "text-slate-500 group-hover:text-indigo-400",
+          )}
+        />
+        <span
+          className={cn(
+            "min-w-0 flex-1 truncate transition-all duration-300",
+            isCollapsed && "lg:hidden",
+          )}
+        >
+          {leaf.label}
+        </span>
+      </Link>
+    );
+  };
+
   return (
     <div className="operations-clean-light min-h-screen bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-indigo-400/40 bg-slate-950/95 px-3 sm:px-4">
+      <header className="sticky top-0 z-60 flex h-14 items-center justify-between gap-3 border-b border-indigo-400/40 bg-slate-950/95 px-3 sm:px-4">
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="inline-flex items-center justify-center rounded-md border border-indigo-400/50 bg-indigo-400/10 px-3 py-2 text-slate-100 hover:bg-indigo-400/20 md:hidden"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            className="inline-flex items-center justify-center rounded-md border-2 border-indigo-400 bg-indigo-400/10 p-2 text-indigo-400 transition-colors hover:bg-indigo-400/20 lg:hidden"
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((o) => !o)}
           >
-            <span className="text-sm font-semibold">{mobileOpen ? "Close" : "Menu"}</span>
+            {mobileOpen ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
           </button>
 
           <div className="min-w-0">
@@ -91,113 +146,48 @@ export default function OperationsLayout({
       </header>
 
       <div className="flex">
-        {mobileOpen && (
+        {mobileOpen ? (
           <div
-            className="fixed inset-0 z-40 bg-slate-950/70 md:hidden"
+            className="fixed inset-0 top-14 z-40 bg-slate-950/60 backdrop-blur-[1px] transition-opacity duration-300 lg:hidden"
             aria-hidden
             onClick={closeMobile}
           />
-        )}
+        ) : null}
 
         <aside
           className={cn(
-            "z-50 hidden w-72 shrink-0 flex-col border-r border-slate-200 bg-white md:flex",
-            mobileOpen ? "fixed left-0 top-14 h-[calc(100vh-3.5rem)]" : "hidden",
+            "relative z-50 flex shrink-0 flex-col border-r border-slate-200 bg-white transition-all duration-300 ease-in-out",
+            "fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-72 -translate-x-full",
+            mobileOpen && "translate-x-0",
+            "lg:static lg:z-auto lg:translate-x-0 lg:pt-0",
+            isCollapsed ? "lg:w-16" : "lg:w-72",
           )}
         >
-          <nav className="flex-1 overflow-y-auto p-4">
+          <button
+            type="button"
+            onClick={toggleCollapse}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={cn(
+              "absolute z-70 hidden h-9 w-9 items-center justify-center rounded-full border-2 border-indigo-400 bg-white text-indigo-400 shadow-md transition-all duration-300 ease-in-out hover:bg-indigo-50 lg:flex",
+              "top-8 -right-[18px]",
+              isCollapsed && "rotate-180",
+            )}
+          >
+            <ChevronLeft className="h-5 w-5" aria-hidden />
+          </button>
+
+          <nav className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden p-3 pt-4">
             <div className="space-y-2">
-              {PRE_GROUP_LEAVES.map((leaf) => {
-                const Icon = ICONS[leaf.icon];
-                const active = isActive(leaf.href);
+              {PRE_GROUP_LEAVES.map(renderLeaf)}
 
-                return (
-                  <Link
-                    key={leaf.href}
-                    href={leaf.href}
-                    onClick={closeMobile}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
-                      active
-                        ? "border-indigo-400/60 bg-indigo-400/10 text-slate-100"
-                        : "border-indigo-400/20 bg-slate-950/30 text-slate-100/70 hover:bg-indigo-400/10 hover:border-indigo-400/50 hover:text-slate-100",
-                    )}
-                  >
-                    <Icon
-                      className={cn(
-                        "h-4 w-4",
-                        active ? "text-indigo-400" : "text-slate-100/70",
-                      )}
-                    />
-                    <span>{leaf.label}</span>
-                  </Link>
-                );
-              })}
-
-             
-              <div className="pt-3 space-y-2">
-                {POST_GROUP_LEAVES.map((leaf) => {
-                  const Icon = ICONS[leaf.icon];
-                  const active = isActive(leaf.href);
-
-                  return (
-                    <Link
-                      key={leaf.href}
-                      href={leaf.href}
-                      onClick={closeMobile}
-                      aria-current={active ? "page" : undefined}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
-                        active
-                          ? "border-indigo-400/60 bg-indigo-400/10 text-slate-100"
-                          : "border-indigo-400/20 bg-slate-950/30 text-slate-100/70 hover:bg-indigo-400/10 hover:border-indigo-400/50 hover:text-slate-100",
-                      )}
-                    >
-                      <Icon
-                        className={cn(
-                          "h-4 w-4",
-                          active ? "text-indigo-400" : "text-slate-100/70",
-                        )}
-                      />
-                      <span>{leaf.label}</span>
-                    </Link>
-                  );
-                })}
+              <div className="space-y-2 pt-3">
+                {POST_GROUP_LEAVES.map(renderLeaf)}
               </div>
             </div>
           </nav>
 
-          <div className="border-t border-indigo-400/40 p-4">
-            <div className="space-y-2">
-              {BOTTOM_LEAVES.map((leaf) => {
-                const Icon = ICONS[leaf.icon];
-                const active = isActive(leaf.href);
-
-                return (
-                  <Link
-                    key={leaf.href}
-                    href={leaf.href}
-                    onClick={closeMobile}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
-                      active
-                        ? "border-indigo-400/60 bg-indigo-400/10 text-slate-100"
-                        : "border-indigo-400/20 bg-slate-950/30 text-slate-100/70 hover:bg-indigo-400/10 hover:border-indigo-400/50 hover:text-slate-100",
-                    )}
-                  >
-                    <Icon
-                      className={cn(
-                        "h-4 w-4",
-                        active ? "text-indigo-400" : "text-slate-100/70",
-                      )}
-                    />
-                    <span>{leaf.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
+          <div className="border-t border-slate-200 p-3">
+            <div className="space-y-2">{BOTTOM_LEAVES.map(renderLeaf)}</div>
           </div>
         </aside>
 
@@ -208,4 +198,3 @@ export default function OperationsLayout({
     </div>
   );
 }
-
