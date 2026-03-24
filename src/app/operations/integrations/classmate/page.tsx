@@ -1,11 +1,10 @@
-import PlaceholderSection from "../../_components/PlaceholderSection";
+﻿import IntegrationSubpageShell from "../_components/IntegrationSubpageShell";
 
 export default function IntegrationsClassmatePage() {
   return (
-    <PlaceholderSection
-      title="Integrations - Classmate"
-      description="Connectivity and synchronization checks for Classmate."
+    <IntegrationSubpageShell
+      title="Classmate Integration"
+      description="Review synchronization health and data mapping for Classmate services."
     />
   );
 }
-

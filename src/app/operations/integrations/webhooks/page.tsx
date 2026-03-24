@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 
 import { Card } from "../../../components/ui/Card";
 
@@ -108,14 +109,38 @@ export default function IntegrationHealthPage() {
   const counts = statusCounts(items);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 bg-slate-50">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-100">
+        <Link
+          href="/operations/integrations"
+          className="inline-flex items-center rounded-lg border border-indigo-400/60 bg-indigo-400/10 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-indigo-400/20"
+        >
+          Back to Integrations
+        </Link>
+      </div>
+
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900">
           Integration Health
         </h1>
-        <p className="mt-1 text-sm text-slate-100/70">
+        <p className="mt-1 text-sm text-slate-600">
           Health status for all webhooks and callbacks.
         </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          className="inline-flex items-center rounded-lg border border-indigo-400/60 bg-indigo-400/10 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-indigo-400/20"
+        >
+          Test Connectivity
+        </button>
+        <button
+          type="button"
+          className="inline-flex items-center rounded-lg border border-indigo-400/60 bg-indigo-400/10 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-indigo-400/20"
+        >
+          View Logs
+        </button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

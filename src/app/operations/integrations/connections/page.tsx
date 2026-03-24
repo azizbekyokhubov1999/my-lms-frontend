@@ -1,11 +1,10 @@
-import PlaceholderSection from "../../_components/PlaceholderSection";
+﻿import IntegrationSubpageShell from "../_components/IntegrationSubpageShell";
 
 export default function IntegrationsConnectionsPage() {
   return (
-    <PlaceholderSection
-      title="Integrations - Connections"
-      description="Service tokens, endpoints, and connection health."
+    <IntegrationSubpageShell
+      title="Integration Health (Connections)"
+      description="Inspect service-level connection diagnostics and endpoint reliability."
     />
   );
 }
-

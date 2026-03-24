@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   CartesianGrid,
   Line,
@@ -97,6 +98,14 @@ export default function DatabaseMonitoringPage() {
 
   return (
     <div className="space-y-5">
+      <div>
+        <Link
+          href="/operations/system-health"
+          className="inline-flex items-center rounded-lg border border-indigo-400/60 bg-indigo-400/10 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-indigo-400/20"
+        >
+          Back to System Overview
+        </Link>
+      </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-100">

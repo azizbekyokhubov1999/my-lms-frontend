@@ -1,11 +1,10 @@
-import PlaceholderSection from "../../_components/PlaceholderSection";
+﻿import IntegrationSubpageShell from "../_components/IntegrationSubpageShell";
 
 export default function IntegrationsTeamsPage() {
   return (
-    <PlaceholderSection
-      title="Integrations - Teams"
-      description="Manage Teams connection, subscriptions, and sync status."
+    <IntegrationSubpageShell
+      title="Teams Integration"
+      description="Manage Teams connectivity, payload delivery, and subscription synchronization."
     />
   );
 }
-

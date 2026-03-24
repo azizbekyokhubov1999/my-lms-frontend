@@ -33,75 +33,14 @@ type NavLeaf = {
   icon: IconKey;
 };
 
-type NavGroup = {
-  label: string;
-  icon: IconKey;
-  items: NavLeaf[];
-};
-
-const SYSTEM_HEALTH_GROUP: NavGroup = {
-  label: "System Health",
-  icon: "activity",
-  items: [
-    { label: "Server", href: "/operations/system-health/server", icon: "activity" },
-    { label: "Database", href: "/operations/system-health/db", icon: "activity" },
-    { label: "Network", href: "/operations/system-health/network", icon: "activity" },
-    { label: "Uptime", href: "/operations/system-health/uptime", icon: "activity" },
-    { label: "Latency", href: "/operations/system-health/latency", icon: "activity" },
-  ],
-};
-
-const INTEGRATIONS_GROUP: NavGroup = {
-  label: "Integrations",
-  icon: "zap",
-  items: [
-    { label: "Teams", href: "/operations/integrations/teams", icon: "zap" },
-    { label: "1C", href: "/operations/integrations/onec", icon: "zap" },
-    { label: "aSc", href: "/operations/integrations/asc", icon: "zap" },
-    { label: "Classmate", href: "/operations/integrations/classmate", icon: "zap" },
-    {
-      label: "Webhooks",
-      href: "/operations/integrations/webhooks",
-      icon: "zap",
-    },
-    {
-      label: "Sync Jobs",
-      href: "/operations/integrations/sync-jobs",
-      icon: "zap",
-    },
-    {
-      label: "Connections",
-      href: "/operations/integrations/connections",
-      icon: "zap",
-    },
-  ],
-};
-
-const INCIDENTS_GROUP: NavGroup = {
-  label: "Incidents",
-  icon: "shieldAlert",
-  items: [
-    {
-      label: "Overview",
-      href: "/operations/incidents/overview",
-      icon: "shieldAlert",
-    },
-    {
-      label: "Critical Logs",
-      href: "/operations/incidents/critical-logs",
-      icon: "shieldAlert",
-    },
-    { label: "Alerts", href: "/operations/incidents/alerts", icon: "shieldAlert" },
-    { label: "Create", href: "/operations/incidents/create", icon: "shieldAlert" },
-    { label: "History", href: "/operations/incidents/history", icon: "shieldAlert" },
-  ],
-};
-
 const PRE_GROUP_LEAVES: NavLeaf[] = [
   { label: "Dashboard", href: "/operations/dashboard", icon: "cpu" },
 ];
 
 const POST_GROUP_LEAVES: NavLeaf[] = [
+  { label: "System Health", href: "/operations/system-health", icon: "activity" },
+  { label: "Integrations", href: "/operations/integrations", icon: "zap" },
+  { label: "Incidents", href: "/operations/incidents", icon: "shieldAlert" },
   { label: "Security", href: "/operations/security", icon: "shieldCheck" },
   { label: "Backup", href: "/operations/backup", icon: "activity" },
   { label: "Performance", href: "/operations/performance", icon: "cpu" },
@@ -129,10 +68,6 @@ export default function OperationsLayout({
     pathname === href || pathname?.startsWith(href + "/");
 
   const closeMobile = React.useCallback(() => setMobileOpen(false), []);
-
-  const SystemHealthIcon = ICONS[SYSTEM_HEALTH_GROUP.icon];
-  const IntegrationsIcon = ICONS[INTEGRATIONS_GROUP.icon];
-  const IncidentsIcon = ICONS[INCIDENTS_GROUP.icon];
 
   return (
     <div className="operations-clean-light min-h-screen bg-slate-50 text-slate-900">
@@ -200,129 +135,7 @@ export default function OperationsLayout({
                 );
               })}
 
-              <div className="pt-3">
-                <div className="flex items-center gap-2 px-1 pb-2">
-                  <div className="h-8 w-8 flex items-center justify-center rounded-md border border-indigo-400/30 bg-indigo-400/10">
-                    <SystemHealthIcon className="h-4 w-4 text-indigo-400" />
-                  </div>
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-100/70">
-                    {SYSTEM_HEALTH_GROUP.label}
-                  </div>
-                </div>
-
-                <div className="space-y-1 pl-4">
-                  {SYSTEM_HEALTH_GROUP.items.map((item) => {
-                    const Icon = ICONS[item.icon];
-                    const active = isActive(item.href);
-
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={closeMobile}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
-                          active
-                            ? "border-indigo-400/60 bg-indigo-400/10 text-slate-100"
-                            : "border-indigo-400/20 bg-slate-950/30 text-slate-100/70 hover:bg-indigo-400/10 hover:border-indigo-400/50 hover:text-slate-100",
-                        )}
-                      >
-                        <Icon
-                          className={cn(
-                            "h-4 w-4",
-                            active ? "text-indigo-400" : "text-slate-100/70",
-                          )}
-                        />
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="pt-3">
-                <div className="flex items-center gap-2 px-1 pb-2">
-                  <div className="h-8 w-8 flex items-center justify-center rounded-md border border-indigo-400/30 bg-indigo-400/10">
-                    <IntegrationsIcon className="h-4 w-4 text-indigo-400" />
-                  </div>
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-100/70">
-                    {INTEGRATIONS_GROUP.label}
-                  </div>
-                </div>
-
-                <div className="space-y-1 pl-4">
-                  {INTEGRATIONS_GROUP.items.map((item) => {
-                    const Icon = ICONS[item.icon];
-                    const active = isActive(item.href);
-
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={closeMobile}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
-                          active
-                            ? "border-indigo-400/60 bg-indigo-400/10 text-slate-100"
-                            : "border-indigo-400/20 bg-slate-950/30 text-slate-100/70 hover:bg-indigo-400/10 hover:border-indigo-400/50 hover:text-slate-100",
-                        )}
-                      >
-                        <Icon
-                          className={cn(
-                            "h-4 w-4",
-                            active ? "text-indigo-400" : "text-slate-100/70",
-                          )}
-                        />
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="pt-3">
-                <div className="flex items-center gap-2 px-1 pb-2">
-                  <div className="h-8 w-8 flex items-center justify-center rounded-md border border-indigo-400/30 bg-indigo-400/10">
-                    <IncidentsIcon className="h-4 w-4 text-indigo-400" />
-                  </div>
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-100/70">
-                    {INCIDENTS_GROUP.label}
-                  </div>
-                </div>
-
-                <div className="space-y-1 pl-4">
-                  {INCIDENTS_GROUP.items.map((item) => {
-                    const Icon = ICONS[item.icon];
-                    const active = isActive(item.href);
-
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={closeMobile}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
-                          active
-                            ? "border-indigo-400/60 bg-indigo-400/10 text-slate-100"
-                            : "border-indigo-400/20 bg-slate-950/30 text-slate-100/70 hover:bg-indigo-400/10 hover:border-indigo-400/50 hover:text-slate-100",
-                        )}
-                      >
-                        <Icon
-                          className={cn(
-                            "h-4 w-4",
-                            active ? "text-indigo-400" : "text-slate-100/70",
-                          )}
-                        />
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-
+             
               <div className="pt-3 space-y-2">
                 {POST_GROUP_LEAVES.map((leaf) => {
                   const Icon = ICONS[leaf.icon];

@@ -1,11 +1,10 @@
-import PlaceholderSection from "../../_components/PlaceholderSection";
+﻿import IntegrationSubpageShell from "../_components/IntegrationSubpageShell";
 
 export default function IntegrationsSyncJobsPage() {
   return (
-    <PlaceholderSection
-      title="Integrations - Sync Jobs"
-      description="Scheduling, last-run status, and job throughput."
+    <IntegrationSubpageShell
+      title="Sync Jobs"
+      description="Manage scheduled synchronization jobs and monitor execution throughput."
     />
   );
 }
-

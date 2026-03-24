@@ -1,11 +1,5 @@
-import PlaceholderSection from "../../_components/PlaceholderSection";
+﻿import { redirect } from "next/navigation";
 
-export default function IncidentsCriticalLogsPage() {
-  return (
-    <PlaceholderSection
-      title="Incidents - Critical Logs"
-      description="High severity log entries and correlated events."
-    />
-  );
+export default function IncidentsCriticalLogsRedirectPage() {
+  redirect("/operations/incidents/incident-history");
 }
-

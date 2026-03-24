@@ -1,11 +1,10 @@
-import PlaceholderSection from "../../_components/PlaceholderSection";
+﻿import IntegrationSubpageShell from "../_components/IntegrationSubpageShell";
 
 export default function IntegrationsAscPage() {
   return (
-    <PlaceholderSection
-      title="Integrations - aSc"
-      description="Configure aSc integration and monitor import health."
+    <IntegrationSubpageShell
+      title="ACS Integration"
+      description="Configure ACS connectors, monitor import batches, and validate payload schema."
     />
   );
 }
-

@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
+import { Boxes, MessageSquare, School, Users } from "lucide-react";
 
 import { Card } from "../../components/ui/Card";
 
@@ -9,7 +11,7 @@ type IntegrationKey = "teams" | "onec" | "asc" | "classmate";
 type IntegrationState = {
   key: IntegrationKey;
   label: string;
-  connectionStatus: "Healthy" | "Syncing" | "Degraded" | "Offline";
+  connectionStatus: "Connected" | "Error";
   lastSyncTs: number | null;
 };
 
@@ -22,144 +24,132 @@ function formatAgo(seconds: number) {
 }
 
 function statusDotClass(status: IntegrationState["connectionStatus"]) {
-  if (status === "Healthy") return "bg-emerald-400";
-  if (status === "Syncing") return "bg-indigo-400";
-  if (status === "Degraded") return "bg-amber-400";
+  if (status === "Connected") return "bg-indigo-400";
   return "bg-rose-400";
 }
 
 export default function IntegrationsDashboardPage() {
-  const [integrations, setIntegrations] = React.useState<IntegrationState[]>([
-    {
-      key: "teams",
-      label: "Teams",
-      connectionStatus: "Healthy",
-      lastSyncTs: Date.now() - 60_000,
-    },
-    {
-      key: "onec",
-      label: "1C",
-      connectionStatus: "Degraded",
-      lastSyncTs: Date.now() - 12 * 60_000,
-    },
-    {
-      key: "asc",
-      label: "aSc",
-      connectionStatus: "Healthy",
-      lastSyncTs: Date.now() - 4 * 60_000,
-    },
-    {
-      key: "classmate",
-      label: "Classmate",
-      connectionStatus: "Healthy",
-      lastSyncTs: Date.now() - 28_000,
-    },
-  ]);
+  const [integrations] = React.useState<IntegrationState[]>(() => {
+    const now = Date.now();
+    return [
+      { key: "teams", label: "Teams", connectionStatus: "Connected", lastSyncTs: now - 60_000 },
+      { key: "onec", label: "OneC", connectionStatus: "Error", lastSyncTs: now - 12 * 60_000 },
+      { key: "asc", label: "ACS", connectionStatus: "Connected", lastSyncTs: now - 4 * 60_000 },
+      { key: "classmate", label: "Classmate", connectionStatus: "Connected", lastSyncTs: now - 28_000 },
+    ];
+  });
 
-  const [, forceTick] = React.useState(0);
-
-  React.useEffect(() => {
-    const id = window.setInterval(() => forceTick((x) => x + 1), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  const reSync = React.useCallback(async (key: IntegrationKey) => {
-    setIntegrations((prev) =>
-      prev.map((i) =>
-        i.key === key
-          ? { ...i, connectionStatus: "Syncing", lastSyncTs: null }
-          : i,
-      ),
-    );
-
-    // Simulate async sync
-    await new Promise((r) => window.setTimeout(r, 1400));
-
-    setIntegrations((prev) =>
-      prev.map((i) => {
-        if (i.key !== key) return i;
-        const r = Math.random();
-        const nextStatus: IntegrationState["connectionStatus"] =
-          r < 0.08 ? "Offline" : r < 0.25 ? "Degraded" : "Healthy";
-        return {
-          ...i,
-          connectionStatus: nextStatus,
-          lastSyncTs: Date.now(),
-        };
-      }),
-    );
-  }, []);
-
-  const cardTone = React.useCallback(
-    (status: IntegrationState["connectionStatus"]) => {
-      if (status === "Healthy")
-        return "border-emerald-400/30 bg-emerald-400/5";
-      if (status === "Syncing")
-        return "border-indigo-400/30 bg-indigo-400/5";
-      if (status === "Degraded") return "border-amber-400/30 bg-amber-400/5";
-      return "border-rose-400/30 bg-rose-400/5";
-    },
-    [],
-  );
+  const integrationMeta: Record<
+    IntegrationKey,
+    { href: string; icon: React.ComponentType<{ className?: string }> }
+  > = {
+    teams: { href: "/operations/integrations/teams", icon: MessageSquare },
+    onec: { href: "/operations/integrations/onec/sync-jobs", icon: Boxes },
+    asc: { href: "/operations/integrations/asc", icon: School },
+    classmate: { href: "/operations/integrations/classmate", icon: Users },
+  };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6 bg-slate-50">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-100">Integrations</h1>
-        <p className="mt-1 text-sm text-slate-100/70">
-          Connection status for Teams, 1C, aSc, and Classmate with manual re-sync.
+        <h1 className="text-2xl font-semibold text-slate-900">Integrations Hub</h1>
+        <p className="mt-1 text-sm text-slate-600">
+          Central dashboard for core services and integration health.
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {integrations.map((i) => (
-          <Card
-            key={i.key}
-            className={`rounded-xl border-indigo-400/30 bg-slate-950 ${cardTone(
-              i.connectionStatus,
-            )}`}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-100/70">
-                  {i.label}
-                </p>
-                <div className="mt-3 flex items-center gap-3">
-                  <span
-                    className={`h-2.5 w-2.5 rounded-full ${statusDotClass(
-                      i.connectionStatus,
-                    )}`}
-                    aria-hidden
-                  />
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-100/60">
-                      Connection Status
-                    </p>
-                    <p className="text-sm font-semibold text-slate-100">
-                      {i.connectionStatus}
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600">
+          Core Integrations
+        </h2>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {integrations.map((i) => {
+            const meta = integrationMeta[i.key];
+            const Icon = meta.icon;
+            const isConnected = i.connectionStatus === "Connected";
+            return (
+              <Card key={i.key} className="rounded-xl border-slate-200 bg-white shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-indigo-400/40 bg-indigo-400/10">
+                        <Icon className="h-4 w-4 text-indigo-400" />
+                      </div>
+                      <p className="text-sm font-semibold text-slate-900">{i.label}</p>
+                    </div>
+                    <div className="mt-3 flex items-center gap-2">
+                      <span
+                        className={`h-2.5 w-2.5 rounded-full ${statusDotClass(i.connectionStatus)}`}
+                        aria-hidden
+                      />
+                      <p
+                        className={`text-sm font-semibold ${
+                          isConnected ? "text-indigo-400" : "text-rose-500"
+                        }`}
+                      >
+                        {i.connectionStatus}
+                      </p>
+                    </div>
+                    <p className="mt-2 text-xs text-slate-600">
+                      Last sync:{" "}
+                      {i.lastSyncTs == null
+                        ? "—"
+                        : formatAgo(Math.max(0, Math.round((Date.now() - i.lastSyncTs) / 1000)))}
                     </p>
                   </div>
                 </div>
-                <p className="mt-2 text-xs text-slate-100/60">
-                  Last sync:{" "}
-                  {i.connectionStatus === "Syncing" || i.lastSyncTs == null
-                    ? "Syncing..."
-                    : formatAgo(Math.max(0, Math.round((Date.now() - i.lastSyncTs) / 1000)))}
-                </p>
-              </div>
 
-              <button
-                type="button"
-                onClick={() => reSync(i.key)}
-                disabled={i.connectionStatus === "Syncing"}
-                className="rounded-lg border border-indigo-400/60 bg-indigo-400/10 px-3 py-2 text-xs font-medium text-slate-100 transition-colors hover:bg-indigo-400/20 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {i.connectionStatus === "Syncing" ? "Re-syncing..." : "Re-sync"}
-              </button>
-            </div>
-          </Card>
-        ))}
-      </div>
+                <div className="mt-4">
+                  <Link
+                    href={meta.href}
+                    className="inline-flex items-center rounded-lg border border-indigo-400/60 bg-indigo-400/10 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-indigo-400/20"
+                  >
+                    Configure
+                  </Link>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600">
+          System Utilities
+        </h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            {
+              title: "Webhooks",
+              description: "Webhook and callback endpoint health.",
+              href: "/operations/integrations/webhooks",
+            },
+            {
+              title: "Integration Health",
+              description: "Service-level connection diagnostics.",
+              href: "/operations/integrations/connections",
+            },
+            {
+              title: "Sync Jobs",
+              description: "Scheduled and manual synchronization tasks.",
+              href: "/operations/integrations/sync-jobs",
+            },
+          ].map((u) => (
+            <Card key={u.href} className="rounded-xl border-slate-200 bg-white shadow-sm">
+              <p className="text-sm font-semibold text-slate-900">{u.title}</p>
+              <p className="mt-1 text-sm text-slate-600">{u.description}</p>
+              <div className="mt-4">
+                <Link
+                  href={u.href}
+                  className="inline-flex items-center rounded-lg border border-indigo-400/60 bg-indigo-400/10 px-3 py-2 text-sm font-medium text-slate-900 transition-colors hover:bg-indigo-400/20"
+                >
+                  Configure
+                </Link>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
