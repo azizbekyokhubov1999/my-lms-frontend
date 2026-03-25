@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 import { verifyOtp } from "@/services/authService";
 import { Button } from "../../components/ui/Button";
@@ -31,7 +32,7 @@ function extractTokenFromResponse(data: unknown): string | null {
   return null;
 }
 
-export default function OtpVerificationPage() {
+function OTPContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phone = searchParams.get("phone") ?? "";
@@ -46,9 +47,7 @@ export default function OtpVerificationPage() {
     setError(null);
 
     if (!email.trim()) {
-      setError(
-        "Email is missing. Please return to registration and try again.",
-      );
+      setError("Email is missing. Please return to registration and try again.");
       return;
     }
 
@@ -66,17 +65,12 @@ export default function OtpVerificationPage() {
       if (token) {
         localStorage.setItem(TOKEN_STORAGE_KEY, token);
       } else {
-        console.warn(
-          "[otp] Verify succeeded but no token field found in response; storing raw response key if present",
-        );
+        console.warn("[otp] Verify succeeded but no token field found in response; storing raw response key if present");
       }
 
       router.push("/admission");
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Invalid or expired code. Please try again.";
+      const message = err instanceof Error ? err.message : "Invalid or expired code. Please try again.";
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -139,5 +133,13 @@ export default function OtpVerificationPage() {
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function OtpVerificationPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OTPContent />
+    </Suspense>
   );
 }

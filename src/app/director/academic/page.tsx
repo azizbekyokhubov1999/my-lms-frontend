@@ -59,7 +59,7 @@ export default function AcademicPerformancePage() {
                 <YAxis domain={[3.5, 4.2]} tick={{ fontSize: 11, fill: "#64748b" }} />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                  formatter={(value: unknown, name: string) => [value, name === "gpa" ? "GPA" : "Students"]}
+                  formatter={(value, name) => [String(value ?? ""), name === "gpa" ? "GPA" : "Students"]}
                   labelFormatter={(label) => label}
                 />
                 <Bar dataKey="gpa" name="gpa" fill="#0f766e" radius={[4, 4, 0, 0]} />
@@ -81,7 +81,7 @@ export default function AcademicPerformancePage() {
                 <YAxis domain={[3.5, 4.2]} tick={{ fontSize: 11, fill: "#64748b" }} />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                  formatter={(value: unknown) => [value, "GPA"]}
+                  formatter={(value) => [String(value ?? ""), "GPA"]}
                 />
                 <Bar dataKey="gpa" name="GPA" fill="#6366f1" radius={[4, 4, 0, 0]} />
               </BarChart>

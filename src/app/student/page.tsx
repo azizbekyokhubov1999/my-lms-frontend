@@ -203,7 +203,7 @@ export default function StudentDashboardPage() {
                 <span
                   className={cn(
                     "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium",
-                    item.dueAt.getTime() - Date.now() < 24 * 60 * 60 * 1000
+                    item.dueAt.getTime() - now.getTime() < 24 * 60 * 60 * 1000
                       ? "bg-amber-100 text-amber-800"
                       : "bg-slate-100 text-slate-700",
                   )}

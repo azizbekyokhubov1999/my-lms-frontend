@@ -80,7 +80,7 @@ export default function RevenueAnalyticsPage() {
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tickFormatter={(v) => `${v}k`} />
               <Tooltip
-                formatter={(v: number) => [`${v}k ₸`, ""]}
+                formatter={(v) => [`${Number(v ?? 0)}k ₸`, ""]}
                 labelFormatter={(label) => label}
               />
               <Bar dataKey="profit" radius={[4, 4, 0, 0]} name="Profit">

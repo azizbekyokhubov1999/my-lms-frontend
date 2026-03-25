@@ -65,7 +65,7 @@ export default function KPITrendPage() {
                 <YAxis tick={{ fontSize: 11, fill: "#64748b" }} />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                  formatter={(value: unknown) => [value, "Enrollment"]}
+                  formatter={(value) => [String(value ?? ""), "Enrollment"]}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px" }} />
                 <Line
@@ -93,7 +93,7 @@ export default function KPITrendPage() {
                 <YAxis domain={[3.5, 4.2]} tick={{ fontSize: 11, fill: "#64748b" }} />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                  formatter={(value: unknown) => [value, "GPA"]}
+                  formatter={(value) => [String(value ?? ""), "GPA"]}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px" }} />
                 <Line
@@ -121,7 +121,7 @@ export default function KPITrendPage() {
                 <YAxis domain={[90, 100]} tick={{ fontSize: 11, fill: "#64748b" }} />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                  formatter={(value: unknown) => [`${value}%`, "Budget %"]}
+                  formatter={(value) => [`${String(value ?? "")}%`, "Budget %"]}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px" }} />
                 <Line

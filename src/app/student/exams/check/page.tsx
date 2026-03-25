@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
+import { Suspense } from "react";
 
 import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
@@ -18,7 +19,7 @@ function cn(
   return classes.filter(Boolean).join(" ");
 }
 
-export default function StudentTechnicalReadinessCheckPage() {
+function StudentTechnicalReadinessCheckContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [examId, setExamId] = React.useState<string>("");
@@ -381,5 +382,13 @@ export default function StudentTechnicalReadinessCheckPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function StudentTechnicalReadinessCheckPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <StudentTechnicalReadinessCheckContent />
+    </Suspense>
   );
 }

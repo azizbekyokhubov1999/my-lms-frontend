@@ -71,11 +71,13 @@ export default function WorkloadForecastPage() {
               />
               <Tooltip
                 contentStyle={{ borderRadius: "8px", border: "1px solid #99f6e4" }}
-                formatter={(value: number, name: string) =>
-                  name === "Enrollment"
-                    ? [`${value.toLocaleString()} students`, name]
-                    : [`${value.toFixed(0)} hours`, name]
-                }
+                formatter={(value, name) => {
+                  const n = Number(value ?? 0);
+                  const safeName = name ?? "Metric";
+                  return safeName === "Enrollment"
+                    ? [`${n.toLocaleString()} students`, safeName]
+                    : [`${n.toFixed(0)} hours`, safeName];
+                }}
               />
               <Legend wrapperStyle={{ fontSize: "12px" }} />
               <Area

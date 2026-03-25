@@ -157,7 +157,10 @@ export default function WorkloadDashboardPage() {
               />
               <Tooltip
                 contentStyle={{ borderRadius: "8px", border: "1px solid #99f6e4" }}
-                formatter={(value: number, name: string) => [`${value.toFixed(1)} h`, name]}
+                formatter={(value, name) => [
+                  `${Number(value ?? 0).toFixed(1)} h`,
+                  name ?? "Metric",
+                ]}
               />
               <Legend wrapperStyle={{ fontSize: "12px" }} />
               <Bar

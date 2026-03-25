@@ -185,8 +185,8 @@ export default function ResourcesDashboardPage() {
         <p className="mt-0.5 text-xs text-slate-600">
           Aggregated performance scores from student feedback and peer review (0–5 scale).
         </p>
-        <div className="mt-4 h-64">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="mt-4 h-[300px]">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <BarChart data={QUALITY_DATA} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis

@@ -52,10 +52,14 @@ export default function GradeAnalyticsPage() {
               <YAxis tick={{ fontSize: 11, fill: "#64748b" }} />
               <Tooltip
                 contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                formatter={(value: unknown, _name: string, props: { payload: { pct: number } }) => [
-                  `${value} students (${props.payload.pct}%)`,
-                  "Count",
-                ]}
+                formatter={(
+                  value,
+                  _name,
+                  props: { payload?: { pct?: number } } | undefined
+                ) => {
+                  const pct = props?.payload?.pct ?? 0;
+                  return [`${value ?? 0} students (${pct}%)`, "Count"];
+                }}
               />
               <Bar dataKey="count" name="Students" fill="#0f766e" radius={[4, 4, 0, 0]} />
             </BarChart>

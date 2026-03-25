@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
+import { Suspense } from "react";
 
 import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
@@ -59,7 +60,7 @@ function loadRubrics(): { id: string; title: string }[] {
   }
 }
 
-export default function AssignmentCreatePage() {
+function AssignmentCreateContent() {
   const searchParams = useSearchParams();
   const rubricParam = searchParams?.get("rubric");
   const [id] = React.useState(() => "a" + Date.now());
@@ -341,5 +342,13 @@ export default function AssignmentCreatePage() {
         </aside>
       </div>
     </div>
+  );
+}
+
+export default function AssignmentCreatePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AssignmentCreateContent />
+    </Suspense>
   );
 }

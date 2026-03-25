@@ -48,7 +48,7 @@ export default function PerformanceDashboardPage() {
                 <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
                 <XAxis dataKey="t" stroke="#64748b" />
                 <YAxis stroke="#64748b" />
-                <Tooltip formatter={(v: number) => [`${v.toFixed(1)}s`, "Load time"]} />
+                <Tooltip formatter={(v) => [`${Number(v ?? 0).toFixed(1)}s`, "Load time"]} />
                 <Line type="monotone" dataKey="value" stroke="#818cf8" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
@@ -63,7 +63,7 @@ export default function PerformanceDashboardPage() {
                 <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
                 <XAxis dataKey="t" stroke="#64748b" />
                 <YAxis stroke="#64748b" />
-                <Tooltip formatter={(v: number) => [`${v.toFixed(1)}s`, "Render time"]} />
+                <Tooltip formatter={(v) => [`${Number(v ?? 0).toFixed(1)}s`, "Render time"]} />
                 <Line type="monotone" dataKey="value" stroke="#818cf8" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>

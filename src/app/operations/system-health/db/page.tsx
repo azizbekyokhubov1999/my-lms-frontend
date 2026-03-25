@@ -173,11 +173,10 @@ export default function DatabaseMonitoringPage() {
                   color: "#e2e8f0",
                 }}
                 labelStyle={{ color: "#e2e8f0" }}
-                formatter={(value: any, name: any) => {
-                  if (name === "latencyMs") return [`${value} ms`, "Latency"];
-                  if (name === "connections")
-                    return [`${value} conns`, "Connections"];
-                  return [String(value), String(name)];
+                formatter={(value, name) => {
+                  if (name === "latencyMs") return [`${Number(value ?? 0)} ms`, "Latency"];
+                  if (name === "connections") return [`${Number(value ?? 0)} conns`, "Connections"];
+                  return [String(value ?? ""), String(name ?? "")];
                 }}
               />
               <Line

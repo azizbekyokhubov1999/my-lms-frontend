@@ -63,7 +63,12 @@ export default function DebtReportPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis type="number" tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
               <YAxis type="category" dataKey="bucket" width={70} />
-              <Tooltip formatter={(v: number) => [`${v.toLocaleString()} ₸`, "Amount"]} />
+              <Tooltip
+                formatter={(v) => [
+                  `${Number(v ?? 0).toLocaleString()} ₸`,
+                  "Amount",
+                ]}
+              />
               <Bar dataKey="amount" radius={[0, 4, 4, 0]}>
                 {AGING_DEBT.map((_, i) => (
                   <Cell key={i} fill={COLORS[i]} />

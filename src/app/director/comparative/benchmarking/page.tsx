@@ -66,7 +66,10 @@ export default function BenchmarkingPage() {
                 <YAxis tick={{ fontSize: 11, fill: "#64748b" }} />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                  formatter={(value: unknown, name: string) => [value, name === "target" ? "Target" : "Actual"]}
+                  formatter={(value, name) => [
+                    String(value ?? ""),
+                    name === "target" ? "Target" : "Actual",
+                  ]}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px" }} />
                 <Bar dataKey="target" name="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} />

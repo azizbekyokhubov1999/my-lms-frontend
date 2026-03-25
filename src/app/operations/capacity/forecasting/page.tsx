@@ -147,7 +147,7 @@ export default function ForecastingPage() {
 
   const utilizationForecast = React.useMemo(() => {
     const pts: { day: string; history: number | null; trend: number | null }[] = [];
-    const now = Date.now();
+    const now = lastUpdated.getTime();
     for (let i = -30; i <= 45; i += 3) {
       const d = new Date(now + i * 86400_000);
       const label = `${d.getMonth() + 1}/${d.getDate()}`;
@@ -160,7 +160,7 @@ export default function ForecastingPage() {
       }
     }
     return pts;
-  }, [seed]);
+  }, [seed, lastUpdated]);
 
   return (
     <div className="space-y-5 bg-slate-50 text-slate-900">

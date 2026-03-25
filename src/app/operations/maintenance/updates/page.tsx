@@ -104,22 +104,25 @@ export default function SystemUpdatesPage() {
     return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
   });
 
-  const [updates, setUpdates] = React.useState<ScheduledUpdate[]>([
-    {
-      id: "u-1",
-      title: "Kernel hardening patch",
-      scope: "Security",
-      scheduledAt: new Date(Date.now() + 5 * 3600_000).toISOString(),
-      status: "Scheduled",
-    },
-    {
-      id: "u-2",
-      title: "Quarterly DB index maintenance",
-      scope: "Database",
-      scheduledAt: new Date(Date.now() + 28 * 3600_000).toISOString(),
-      status: "Pending",
-    },
-  ]);
+  const [updates, setUpdates] = React.useState<ScheduledUpdate[]>(() => {
+    const now = Date.now();
+    return [
+      {
+        id: "u-1",
+        title: "Kernel hardening patch",
+        scope: "Security",
+        scheduledAt: new Date(now + 5 * 3600_000).toISOString(),
+        status: "Scheduled",
+      },
+      {
+        id: "u-2",
+        title: "Quarterly DB index maintenance",
+        scope: "Database",
+        scheduledAt: new Date(now + 28 * 3600_000).toISOString(),
+        status: "Pending",
+      },
+    ];
+  });
 
   const downtime = estimateDowntimeMinutes(pendingUpdates);
 

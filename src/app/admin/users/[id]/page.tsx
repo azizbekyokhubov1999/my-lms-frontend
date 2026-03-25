@@ -56,7 +56,9 @@ export default function AdminUserDetailPage() {
   const params = useParams();
   const id = (params?.id as string) ?? "";
   const user = MOCK_USERS[id];
-  const logs = (id && MOCK_ACCESS_LOGS[id]) ?? [];
+  const logs: Array<{ id: string; action: string; ip: string; at: string }> = id
+    ? MOCK_ACCESS_LOGS[id] ?? []
+    : [];
 
   if (!user) {
     return (

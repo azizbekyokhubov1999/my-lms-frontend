@@ -96,8 +96,13 @@ export default function DirectorDashboardPage() {
         <p className="mt-0.5 text-xs text-slate-500">
           Attendance vs. grade trends over the last 6 months.
         </p>
-        <div className="mt-4 h-72">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="mt-4 h-[300px]">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+          >
             <AreaChart data={PERFORMANCE_DATA} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="attendanceFill" x1="0" y1="0" x2="0" y2="1">
@@ -115,7 +120,7 @@ export default function DirectorDashboardPage() {
               <YAxis yAxisId="grade" orientation="right" tick={{ fontSize: 11, fill: "#64748b" }} domain={[3.5, 5]} />
               <Tooltip
                 contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                formatter={(value: unknown) => [value, undefined]}
+                formatter={(value) => [String(value ?? ""), ""]}
                 labelFormatter={(label) => `Month: ${label}`}
               />
               <Legend wrapperStyle={{ fontSize: "12px" }} />
@@ -195,8 +200,13 @@ export default function DirectorDashboardPage() {
           <p className="mt-0.5 text-xs text-slate-500">
             Tuition fees – Paid vs. Outstanding.
           </p>
-          <div className="mt-4 h-56">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="mt-4 h-[300px]">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              minWidth={0}
+              minHeight={0}
+            >
               <PieChart>
                 <Pie
                   data={TUITION_DATA}

@@ -49,8 +49,14 @@ const AT_RISK_GROUPS = [
   { id: "G-LAW-1C", name: "Law 1C", attendance: 55, faculty: "Law" },
 ];
 
-const SYNC_STATUS = {
-  status: "success" as const,
+type SyncStatus = "success" | "error" | "pending";
+
+const SYNC_STATUS: {
+  status: SyncStatus;
+  lastSync: string;
+  message: string;
+} = {
+  status: "success",
   lastSync: "2026-03-06 08:15",
   message: "aSc Timetable sync completed. 142 groups, 0 conflicts.",
 };
@@ -89,15 +95,20 @@ export default function AcademicDashboardPage() {
             Average GPA by Faculty (trend)
           </h2>
           <p className="mt-0.5 text-xs text-slate-600">Last 6 periods across faculties.</p>
-          <div className="mt-4 h-72">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="mt-4 h-[300px]">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              minWidth={0}
+              minHeight={0}
+            >
               <LineChart data={GPA_TREND_DATA} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e9d5ff" />
                 <XAxis dataKey="period" tick={{ fontSize: 11, fill: "#64748b" }} />
                 <YAxis domain={[2.8, 3.6]} tick={{ fontSize: 11, fill: "#64748b" }} tickFormatter={(v) => v.toFixed(2)} />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e9d5ff" }}
-                  formatter={(value: number) => [value.toFixed(2), ""]}
+                  formatter={(value) => [Number(value ?? 0).toFixed(2), ""]}
                   labelFormatter={(label) => `Period: ${label}`}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px" }} />

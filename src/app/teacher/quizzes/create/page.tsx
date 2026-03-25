@@ -374,7 +374,7 @@ export default function QuizCreatePage() {
                                       disabled={isLocked}
                                       className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-sm disabled:bg-slate-100"
                                     />
-                                    {q.options.length > 1 && !isLocked && (
+                                    {(q.options?.length ?? 0) > 1 && !isLocked && (
                                       <button type="button" onClick={() => removeOption(q.id, i)} className="text-red-600 hover:underline">
                                         ×
                                       </button>

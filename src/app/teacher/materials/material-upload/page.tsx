@@ -118,7 +118,6 @@ export default function MaterialUploadPage() {
         clearInterval(interval);
         saveToLibrary({
           id,
-          file: itemData.file,
           title: itemData.title,
           type: itemData.type,
           accessibility: itemData.accessibility,

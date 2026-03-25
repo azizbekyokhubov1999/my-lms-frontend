@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
+import { Suspense } from "react";
 
 import { Button } from "../../../../components/ui/Button";
 import { Card } from "../../../../components/ui/Card";
@@ -16,11 +17,7 @@ import {
   setStoredRules,
 } from "../../eligibilityRules";
 
-function cn(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(" ");
-}
-
-export default function ManageRulePage() {
+function ManageRuleContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -211,5 +208,13 @@ export default function ManageRulePage() {
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function ManageRulePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ManageRuleContent />
+    </Suspense>
   );
 }

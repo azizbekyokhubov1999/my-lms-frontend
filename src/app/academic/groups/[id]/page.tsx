@@ -41,7 +41,7 @@ export default function GroupDetailPage() {
   const params = useParams();
   const id = typeof params?.id === "string" ? params.id : "";
   const group = id ? MOCK_GROUPS[id] : null;
-  const students = (id && MOCK_STUDENTS[id]) ?? [];
+  const students: StudentRow[] = id ? MOCK_STUDENTS[id] ?? [] : [];
 
   if (!group) {
     return (

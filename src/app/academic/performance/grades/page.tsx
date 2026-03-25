@@ -101,7 +101,7 @@ export default function GradeReportPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e9d5ff" />
                 <XAxis dataKey="period" tick={{ fontSize: 11 }} />
                 <YAxis domain={[2.8, 3.4]} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number) => [v.toFixed(2), "Avg GPA"]} />
+                <Tooltip formatter={(v) => [Number(v ?? 0).toFixed(2), "Avg GPA"]} />
                 <Line type="monotone" dataKey="avg" name="Avg GPA" stroke={PURPLE_BAR} strokeWidth={2} dot={{ fill: PURPLE_BAR }} />
               </LineChart>
             </ResponsiveContainer>

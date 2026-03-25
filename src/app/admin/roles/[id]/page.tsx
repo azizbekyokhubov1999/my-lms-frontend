@@ -53,7 +53,7 @@ export default function AdminRoleDetailPage() {
   const params = useParams();
   const id = (params?.id as string) ?? "";
   const role = id ? ROLES[id] : null;
-  const users = (id && USERS_BY_ROLE[id]) ?? [];
+  const users: UserRow[] = id ? USERS_BY_ROLE[id] : [];
 
   if (!role) {
     return (

@@ -225,7 +225,7 @@ export default function ExamTakingPage() {
             Camera
           </div>
           <div className="h-28 w-40 bg-slate-800">
-            {cameraReady && videoRef.current ? (
+            {cameraReady ? (
               <video
                 ref={videoRef}
                 autoPlay

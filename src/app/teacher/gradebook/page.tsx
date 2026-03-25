@@ -107,11 +107,11 @@ function mergeWithPostedGrades(
   posted: Record<string, number>,
 ): GradeRow[] {
   return baseRows.map((row) => {
-    const merged = { ...row };
+    const merged: GradeRow = { ...row };
     (["a1", "a2", "a3"] as const).forEach((key) => {
       const storageKey = `${courseId}-${row.studentId}-${key}`;
       if (posted[storageKey] != null) {
-        (merged as Record<string, number | null>)[key] = posted[storageKey];
+        merged[key] = posted[storageKey];
       }
     });
     return merged;

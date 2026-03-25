@@ -63,10 +63,16 @@ export default function ForecastingPage() {
                 <YAxis tick={{ fontSize: 11, fill: "#64748b" }} tickFormatter={(v) => `$${v}M`} />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                  formatter={(value: unknown, _name: string, props: { payload: { projected?: boolean } }) => [
-                    `$${value}M${props.payload.projected ? " (projected)" : ""}`,
-                    "Revenue",
-                  ]}
+                  formatter={(value, _name, props) => {
+                    const revenueM = Number(value ?? 0);
+                    const projected =
+                      (props as { payload?: { projected?: boolean } } | undefined)?.payload
+                        ?.projected ?? false;
+                    return [
+                      `$${revenueM}M${projected ? " (projected)" : ""}`,
+                      "Revenue",
+                    ];
+                  }}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px" }} />
                 <Line
@@ -103,10 +109,16 @@ export default function ForecastingPage() {
                 <YAxis domain={[85, 95]} tick={{ fontSize: 11, fill: "#64748b" }} />
                 <Tooltip
                   contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                  formatter={(value: unknown, _name: string, props: { payload: { projected?: boolean } }) => [
-                    `${value}%${props.payload.projected ? " (projected)" : ""}`,
-                    "Graduation rate",
-                  ]}
+                  formatter={(value, _name, props) => {
+                    const rate = Number(value ?? 0);
+                    const projected =
+                      (props as { payload?: { projected?: boolean } } | undefined)?.payload
+                        ?.projected ?? false;
+                    return [
+                      `${rate}%${projected ? " (projected)" : ""}`,
+                      "Graduation rate",
+                    ];
+                  }}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px" }} />
                 <Line

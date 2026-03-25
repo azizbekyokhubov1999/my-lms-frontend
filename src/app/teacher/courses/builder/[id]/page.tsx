@@ -190,8 +190,9 @@ export default function CourseBuilderPage() {
   };
 
   const removeModule = (moduleId: string) => {
+    const remaining = modules.filter((m) => m.id !== moduleId);
     setModules((prev) => prev.filter((m) => m.id !== moduleId));
-    if (expandedModuleId === moduleId) setExpandedModuleId(prev[0]?.id ?? null);
+    if (expandedModuleId === moduleId) setExpandedModuleId(remaining[0]?.id ?? null);
   };
 
   const moveModule = (moduleId: string, direction: "up" | "down") => {

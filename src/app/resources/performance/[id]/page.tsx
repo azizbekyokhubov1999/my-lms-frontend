@@ -156,7 +156,7 @@ export default function TeacherPerformancePage() {
               />
               <Tooltip
                 contentStyle={{ borderRadius: "8px", border: "1px solid #99f6e4" }}
-                formatter={(value: number) => [value, "Score"]}
+                formatter={(value) => [Number(value ?? 0), "Score"]}
               />
               <Legend wrapperStyle={{ fontSize: "12px" }} />
             </RadarChart>

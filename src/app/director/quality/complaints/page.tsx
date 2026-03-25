@@ -77,11 +77,19 @@ export default function ComplaintsAnalysisPage() {
               <ZAxis type="number" dataKey="z" range={[50, 400]} name="Count" />
               <Tooltip
                 contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                formatter={(value: unknown, name: string, props: { payload: (typeof BUBBLE_DATA)[0] }) => {
-                  const p = props.payload;
-                  if (name === "y") return [p.sentiment, "Sentiment (0–100)"];
-                  if (name === "z" || name === "count") return [p.count, "Complaints"];
-                  return [value, name];
+                formatter={(value, name, props) => {
+                  type BubbleDatum = (typeof BUBBLE_DATA)[number];
+                  const p = (props?.payload as BubbleDatum | undefined) ?? undefined;
+
+                  if (name === "y") {
+                    return [p?.sentiment ?? Number(value ?? 0), "Sentiment (0–100)"];
+                  }
+
+                  if (name === "z" || name === "count") {
+                    return [p?.count ?? Number(value ?? 0), "Complaints"];
+                  }
+
+                  return [String(value ?? ""), "Value"];
                 }}
                 labelFormatter={(_, payload) => payload?.[0]?.payload?.category ?? ""}
               />

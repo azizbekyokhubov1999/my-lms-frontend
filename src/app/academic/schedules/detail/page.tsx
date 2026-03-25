@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
+import { Suspense } from "react";
 
 import { Card } from "../../../components/ui/Card";
 
@@ -12,7 +13,7 @@ const MOCK_DAY_CLASSES = [
   { id: "c3", time: "14:00–15:30", group: "SD-24-02", course: "CS102 Data Structures", room: "A102", teacher: "Dr. Sokolova" },
 ];
 
-export default function ScheduleDetailPage() {
+function ScheduleDetailContent() {
   const searchParams = useSearchParams();
   const date = searchParams.get("date") ?? "Fri 6 Mar";
   const slot = searchParams.get("slot") ?? "09:00";
@@ -57,5 +58,13 @@ export default function ScheduleDetailPage() {
         </div>
       </Card>
     </div>
+  );
+}
+
+export default function ScheduleDetailPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ScheduleDetailContent />
+    </Suspense>
   );
 }

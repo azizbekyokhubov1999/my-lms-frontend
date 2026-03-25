@@ -29,15 +29,13 @@ function statusDotClass(status: IntegrationState["connectionStatus"]) {
 }
 
 export default function IntegrationsDashboardPage() {
-  const [integrations] = React.useState<IntegrationState[]>(() => {
-    const now = Date.now();
-    return [
-      { key: "teams", label: "Teams", connectionStatus: "Connected", lastSyncTs: now - 60_000 },
-      { key: "onec", label: "OneC", connectionStatus: "Error", lastSyncTs: now - 12 * 60_000 },
-      { key: "asc", label: "ACS", connectionStatus: "Connected", lastSyncTs: now - 4 * 60_000 },
-      { key: "classmate", label: "Classmate", connectionStatus: "Connected", lastSyncTs: now - 28_000 },
-    ];
-  });
+  const [nowTs] = React.useState(() => Date.now());
+  const [integrations] = React.useState<IntegrationState[]>(() => [
+    { key: "teams", label: "Teams", connectionStatus: "Connected", lastSyncTs: nowTs - 60_000 },
+    { key: "onec", label: "OneC", connectionStatus: "Error", lastSyncTs: nowTs - 12 * 60_000 },
+    { key: "asc", label: "ACS", connectionStatus: "Connected", lastSyncTs: nowTs - 4 * 60_000 },
+    { key: "classmate", label: "Classmate", connectionStatus: "Connected", lastSyncTs: nowTs - 28_000 },
+  ]);
 
   const integrationMeta: Record<
     IntegrationKey,
@@ -94,7 +92,7 @@ export default function IntegrationsDashboardPage() {
                       Last sync:{" "}
                       {i.lastSyncTs == null
                         ? "—"
-                        : formatAgo(Math.max(0, Math.round((Date.now() - i.lastSyncTs) / 1000)))}
+                        : formatAgo(Math.max(0, Math.round((nowTs - i.lastSyncTs) / 1000)))}
                     </p>
                   </div>
                 </div>

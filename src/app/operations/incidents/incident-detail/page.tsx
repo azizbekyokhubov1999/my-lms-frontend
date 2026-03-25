@@ -3,6 +3,7 @@
 import Link from "next/link";
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 import { Card } from "../../../components/ui/Card";
 import { Incident, loadIncidents, saveIncidents, severityBadge } from "../_shared";
@@ -16,7 +17,7 @@ function formatShort(d: Date) {
   });
 }
 
-export default function IncidentDetailPage() {
+function IncidentDetailContent() {
   const searchParams = useSearchParams();
   const incidentId = searchParams.get("id");
   const [incident, setIncident] = React.useState<Incident | null>(null);
@@ -166,6 +167,14 @@ export default function IncidentDetailPage() {
         </div>
       ) : null}
     </div>
+  );
+}
+
+export default function IncidentDetailPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <IncidentDetailContent />
+    </Suspense>
   );
 }
 

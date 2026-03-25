@@ -77,7 +77,16 @@ export default function RetentionAnalyticsPage() {
               <YAxis tick={{ fontSize: 11, fill: "#64748b" }} />
               <Tooltip
                 contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0" }}
-                formatter={(value: unknown, name: string) => [Number(value).toLocaleString(), name === "enrolled" ? "Enrolled" : name === "active" ? "Active" : "Retention %"]}
+                formatter={(value, name) => {
+                  const num = Number(value ?? 0);
+                  const label =
+                    name === "enrolled"
+                      ? "Enrolled"
+                      : name === "active"
+                        ? "Active"
+                        : "Retention %";
+                  return [num.toLocaleString(), label];
+                }}
                 labelFormatter={(label) => `Intake ${label}`}
               />
               <Bar dataKey="enrolled" name="enrolled" fill="#94a3b8" radius={[4, 4, 0, 0]} />

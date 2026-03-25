@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
+import { Suspense } from "react";
 
 import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
@@ -60,7 +61,7 @@ const MOCK_1C_UNMATCHED: BankRecord[] = [
 const ALL_LMS = MOCK_LMS_UNMATCHED;
 const ALL_1C = MOCK_1C_UNMATCHED;
 
-export default function ManualMatchPage() {
+function ManualMatchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const lmsParam = searchParams.get("lms");
@@ -213,5 +214,13 @@ export default function ManualMatchPage() {
         </Card>
       )}
     </div>
+  );
+}
+
+export default function ManualMatchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ManualMatchContent />
+    </Suspense>
   );
 }
