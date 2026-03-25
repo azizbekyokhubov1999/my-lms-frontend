@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
+import { ArrowLeft } from "lucide-react";
 
 import { useAuth } from "@/hooks/useAuth";
 
@@ -207,6 +208,15 @@ export default function AdmissionLayout({
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
+          <Link
+            href="/"
+            onClick={() => setSidebarOpen(false)}
+            className="m-3 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-orange-400"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            <span className="text-base leading-none font-semibold">Back to Hub</span>
+          </Link>
+
           <nav className="flex flex-col gap-0.5 p-3" aria-label="Applicant sections">
             {SIDEBAR_NAV.map((item) => {
               const isActive =

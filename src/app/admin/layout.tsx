@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
 
+import { ArrowLeft } from "lucide-react";
+
 import { Button } from "../components/ui/Button";
 
 function cn(...classes: Array<string | false | null | undefined>) {
@@ -208,6 +210,18 @@ export default function AdminLayout({
   const showCollapsed = sidebarCollapsed && !mobileMenuOpen;
   const sidebarContent = (
     <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Admin navigation">
+      <Link
+        href="/"
+        className={cn(
+          "mb-2 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-orange-400",
+          showCollapsed && "justify-center px-2",
+        )}
+        title={showCollapsed ? "Back to Hub" : undefined}
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden />
+        <span className={cn(showCollapsed && "lg:hidden")}>Back to Hub</span>
+      </Link>
+
       {NAV_GROUPS.map((group) => (
         <div key={group.label}>
           {!showCollapsed && (

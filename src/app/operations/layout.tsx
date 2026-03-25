@@ -2,6 +2,7 @@
 
 import {
   Activity,
+  ArrowLeft,
   ChevronLeft,
   Cpu,
   Menu,
@@ -163,6 +164,21 @@ export default function OperationsLayout({
             isCollapsed ? "lg:w-16" : "lg:w-72",
           )}
         >
+          <Link
+            href="/"
+            onClick={closeMobile}
+            className={cn(
+              "mb-3 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-orange-400",
+              isCollapsed && "lg:justify-center lg:px-2",
+            )}
+            title={isCollapsed ? "Back to Hub" : undefined}
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            <span className={cn("min-w-0 truncate transition-all", isCollapsed && "lg:hidden")}>
+              Back to Hub
+            </span>
+          </Link>
+
           <button
             type="button"
             onClick={toggleCollapse}

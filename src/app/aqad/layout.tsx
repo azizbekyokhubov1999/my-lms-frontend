@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
+import { ArrowLeft } from "lucide-react";
 
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
@@ -82,6 +83,15 @@ export default function AqadLayout({ children }: AqadLayoutProps) {
               <span className="text-lg leading-none">&times;</span>
             </button>
           </div>
+
+          <Link
+            href="/"
+            onClick={() => setSidebarOpen(false)}
+            className="mx-4 mt-3 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-orange-400"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            <span className="text-base font-semibold">Back to Hub</span>
+          </Link>
 
           <nav className="flex-1 overflow-y-auto px-3 py-4 text-sm" aria-label="Main">
             <ul className="space-y-1">

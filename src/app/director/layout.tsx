@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   Award,
   BarChart2,
+  ArrowLeft,
   Briefcase,
   CalendarCheck,
   CircleDollarSign,
@@ -80,6 +81,21 @@ export default function DirectorLayout({ children }: { children: React.ReactNode
 
   const sidebarContent = (
     <div className="flex h-full min-h-0 flex-col">
+      <Link
+        href="/"
+        onClick={() => setMobileOpen(false)}
+        className={cn(
+          "mx-3 mt-3 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-orange-400",
+          showCollapsed && "justify-center px-2",
+        )}
+        title={showCollapsed ? "Back to Hub" : undefined}
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden />
+        <span className={cn("min-w-0 truncate transition-all", showCollapsed && "lg:hidden")}>
+          Back to Hub
+        </span>
+      </Link>
+
       <div
         className="flex-1 overflow-y-auto pb-10 p-3 sm:p-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-slate-500/10 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-400/50 [&::-webkit-scrollbar-thumb]:hover:bg-slate-400/70"
         style={{ scrollbarWidth: "thin", scrollbarColor: "rgb(148 163 184 / 0.5) transparent" }}

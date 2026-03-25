@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
+import { ArrowLeft } from "lucide-react";
 
 import { Button } from "../components/ui/Button";
 
@@ -170,6 +171,21 @@ export default function FinanceLayout({ children }: { children: React.ReactNode 
 
   const sidebarContent = (
     <>
+      <Link
+        href="/"
+        onClick={() => setMobileOpen(false)}
+        className={cn(
+          "mb-3 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-orange-400",
+          showCollapsed && "justify-center px-2",
+        )}
+        title={showCollapsed ? "Back to Hub" : undefined}
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden />
+        <span className={cn("min-w-0 truncate transition-all", showCollapsed && "lg:hidden")}>
+          Back to Hub
+        </span>
+      </Link>
+
       <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-3 sm:p-4 overscroll-contain touch-pan-y" aria-label="Finance navigation">
         {NAV_ITEMS.map((item) => (
           <Link
